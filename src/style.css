@@ -12,3 +12,10 @@ body {
     color: var(--text-color);
     background-color: var(--back-color);
 }
+
+@media (prefers-color-scheme: dark) {
+    body {
+        --text-color: #dddddd;
+        --back-color: #222222;
+    }
+}
