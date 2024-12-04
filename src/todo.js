@@ -25,11 +25,22 @@ todo.Item = function(title) {
     this.title = title;
     this._description = "";
     this._dueDate = null;
+    this._completionDate = null;
     this._priority = todo.Priority.SEMI_IMPORTANT;
-    this._isDone = false;
 };
 
 Object.defineProperties(todo.Item.prototype, {
+    completionDate: {
+        get: function() { return this._completionDate; },
+        set: function(value) {
+            // Null is valid; it means the task has not been completed.
+            if (null === value || undefined === value) {
+                this._completionDate = null;
+            } else {
+                this._completionDate = new Date(value);
+            }
+        }
+    },
     description: {
         get: function() { return this._description; },
         set: function(value) { this._description = value; },
@@ -38,30 +49,12 @@ Object.defineProperties(todo.Item.prototype, {
     dueDate: {
         get: function() { return this._dueDate; },
         set: function(value) {
-            // Null is a valid due date.
+            // Null is valid; it means there is no due date.
             if (null === value || undefined === value) {
                 this._dueDate = null;
-                return;
+            } else {
+                this._dueDate = new Date(value);
             }
-
-            // Parse and validate the due date.
-            let newDate = value;
-            if (typeof newDate == "string") {
-                newDate = Date.parse(newDate); // Makes a numeric timestamp
-            }
-            if (typeof newDate == "number") {
-                if (Number.isNaN(newDate)) {
-                    throw new Error("Cannot set dueDate to invalid date", value);
-                } else {
-                    newDate = new Date(newDate);
-                }
-            }
-            if (newDate instanceof Date == false) {
-                throw new Error("Cannot set dueDate to non-date", value);
-            }
-
-            // If we're here, all parsing and testing passed.
-            this._dueDate = newDate;
         },
         enumerable: true,
     },
@@ -87,12 +80,19 @@ Object.defineProperties(todo.Item.prototype, {
     },
 });
 
-todo.Item.prototype.isDone = function() {
-    return this._isDone;
+todo.Item.prototype.isComplete = function() {
+    return this.completionDate != null;
 };
 
-todo.Item.prototype.markDone = function(complete = true) {
-    this._isDone = !!complete;
+todo.Item.prototype.markComplete = function(date = null) {
+    if (null === date) {
+        date = Date.now();
+    }
+    this.completionDate = date;
+};
+
+todo.Item.prototype.unmarkComplete = function() {
+    this.completionDate = null;
 };
 
 //=============================================================================
