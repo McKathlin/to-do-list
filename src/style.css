@@ -1,3 +1,5 @@
+/* Entire Site */
+
 *, *::before, *::after {
     margin: 0;
     padding: 0;
@@ -23,3 +25,29 @@ body {
 .hidden {
     display: none;
 }
+
+/* Title Heading */
+
+/* Project List Nav */
+
+#project-select {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+#project-select menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+}
+
+/* Project Info Region */
+
+/* To-Do List */
+
+/* Completed Tasks */
+
+/* Footer */
