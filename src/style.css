@@ -19,3 +19,7 @@ body {
         --back-color: #222222;
     }
 }
+
+.hidden {
+    display: none;
+}
