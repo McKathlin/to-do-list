@@ -151,7 +151,7 @@ const todo = (function() {
             this._description = str;
         }
 
-        get allTaskss() {
+        get allTasks() {
             return this._list.slice();
         }
 
