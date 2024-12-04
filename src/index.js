@@ -5,9 +5,14 @@ import todo from "./todo.js";
 
 console.log("This is where the site gets built.");
 
-const toDoItem = new todo.Item("Do the thing");
-const otherItem = new todo.Item("Try another thing");
-toDoItem.markComplete();
+const currentProject = new todo.Project("Bogus Biz");
+currentProject.addItem({
+    title: "Do the thing",
+    description: "This thing needs to be done NOW!",
+    priority: todo.Priority.MOST_IMPORTANT,
+    dueDate: Date.now(),
+});
+currentProject.addItem("Try another thing");
 
 const SiteController = (function() {
     const listContainerNode = document.getElementById("list-container");
@@ -16,7 +21,7 @@ const SiteController = (function() {
         const buttonComplete = doc.make("button.complete-button", "Done!");
         const toDoNode = doc.make(".to-do-item", [
             doc.h2(item.title),
-            doc.p(item.description ?? ""),
+            doc.p(item.description),
             buttonComplete,
         ]);
         listContainerNode.append(toDoNode);
@@ -24,13 +29,21 @@ const SiteController = (function() {
         buttonComplete.addEventListener("click", function() {
             console.log(item.title);
             item.markComplete();
+            refresh();
         });
     };
 
+    const refresh = function() {
+        listContainerNode.replaceChildren();
+        for (let item of currentProject.actionItems) {
+            renderToDoItem(item);
+        }
+    };
+
     return {
+        refresh,
         renderToDoItem,
     };
 })();
 
-SiteController.renderToDoItem(toDoItem);
-SiteController.renderToDoItem(otherItem);
+SiteController.refresh();
