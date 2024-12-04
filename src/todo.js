@@ -79,7 +79,7 @@ const todo = (function() {
             return this._priority;
         }
         set priority(p) {
-            if (p in Object.values(Priority)) {
+            if (Object.values(Priority).includes(p)) {
                 this._priority = p;
             } else {
                 throw new Error("Unrecognized priority:", p);
