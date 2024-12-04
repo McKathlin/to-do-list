@@ -4,16 +4,13 @@ import doc from "./lib/doc.js";
 import todo from "./todo.js";
 
 const allProjects = [];
+let currentProject = null;
 
 //=============================================================================
 // Main Page Controller
 //=============================================================================
 
 const MainPageController = (function() {
-    // Variables
-
-    let _currentProject = null;
-
     // Nodes
 
     const projectListNode = document.getElementById("project-list");
@@ -46,7 +43,7 @@ const MainPageController = (function() {
     };
 
     const setProject = function(project) {
-        _currentProject = project;
+        currentProject = project;
         refresh();
     };
 
@@ -76,13 +73,13 @@ const MainPageController = (function() {
     };
 
     const _renderCurrentProjectInfo = function() {
-        projectNameNode.innerText = _currentProject.name;
-        projectDescriptionNode.innerText = _currentProject.description;
+        projectNameNode.innerText = currentProject.name;
+        projectDescriptionNode.innerText = currentProject.description;
     };
 
     const _renderToDoList = function() {
         taskListContainerNode.replaceChildren();
-        for (const task of _currentProject.actionTasks) {
+        for (const task of currentProject.actionTasks) {
             taskListContainerNode.appendChild(_makeToDoNode(task));
         }
     };
@@ -103,7 +100,7 @@ const MainPageController = (function() {
 
     const _renderCompletedTasks = function(task) {
         completedListContainerNode.replaceChildren();
-        for (const task of _currentProject.completedTasks) {
+        for (const task of currentProject.completedTasks) {
             completedListContainerNode.appendChild(_makeCompletedNode(task));
         }
     };
@@ -147,13 +144,14 @@ const NewProjectFormController = (function() {
     });
 
     newProjectSubmit.addEventListener("click", function(event) {
-        if (newProjectForm.checkValidity()) {
-            event.preventDefault();
-            const name = projectNameInput.value;
-            const description = projectDescriptionInput.value;
-            addProject(name, description);
-            hideDialog();
+        if (newProjectForm.checkValidity() == false) {
+            return; // Do built-in validation and nothing else
         }
+        event.preventDefault();
+        const name = projectNameInput.value;
+        const description = projectDescriptionInput.value;
+        addProject(name, description);
+        hideDialog();
     });
 
     newProjectCancel.addEventListener("click", function(event) {
@@ -204,7 +202,7 @@ const ProjectEditController = (function() {
     };
 
     return {
-        removeProject
+        removeProject,
     };
 })();
 
@@ -213,8 +211,9 @@ const ProjectEditController = (function() {
 //=============================================================================
 
 const NewTaskFormController = (function() {
-    const newTaskContainerNode =
-        document.getElementById("new-task-container");
+
+    // Nodes
+
     const newTaskShowButton =
         document.getElementById("new-task-show-button");
 
@@ -232,11 +231,53 @@ const NewTaskFormController = (function() {
         document.getElementById("new-task-due-date");
     const newTaskSubmitButton =
         document.getElementById("new-task-submit");
-    // !!! Set up new task form
-    // !!! Process new task form
+    const newTaskCancelButton =
+        document.getElementById("new-task-cancel");
+    
+    // Setup
+
+    newTaskShowButton.addEventListener("click", function(event) {
+        showDialog();
+    });
+
+    newTaskSubmitButton.addEventListener("click", function(event) {
+        if (newTaskForm.checkValidity() == false) {
+            return; // Do built-in validation and nothing else.
+        }
+        event.preventDefault();
+        let properties = {
+            title: newTaskTitleInput.value,
+            description: newTaskDescriptionInput.value,
+            priority: Number.parseInt(newTaskPriorityInput.value),
+            dueDate: newTaskDueDateInput.value,
+        };
+        addTask(properties);
+        hideDialog();
+    });
+
+    newTaskCancelButton.addEventListener("click", function(event) {
+        hideDialog();
+    });
+
+    // Public methods
+
+    const showDialog = function() {
+        newTaskDialog.classList.remove("hidden");
+    };
+
+    const hideDialog = function() {
+        newTaskDialog.classList.add("hidden");
+    };
+
+    const addTask = function(properties) {
+        currentProject.addTask(properties);
+        MainPageController.refresh();
+    };
 
     return {
-        // !!!
+        showDialog,
+        hideDialog,
+        addTask,
     };
 })();
 
