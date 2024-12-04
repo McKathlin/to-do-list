@@ -4,100 +4,102 @@
 // Defines to-do items, projects, and priorities
 //=============================================================================
 
-const todo = {};
+const todo = (function() {
+    //=========================================================================
+    // Priority
+    //=========================================================================
 
-//=============================================================================
-// Priority
-//=============================================================================
+    const Priority = Object.freeze({
+        MOST_IMPORTANT: 1,
+        IMPORTANT: 2,
+        SEMI_IMPORTANT: 3,
+        NOT_IMPORTANT: 4,
+    });
 
-todo.Priority = Object.freeze({
-    MOST_IMPORTANT: 1,
-    IMPORTANT: 2,
-    SEMI_IMPORTANT: 3,
-    NOT_IMPORTANT: 4,
-});
+    //=========================================================================
+    // To-Do Item
+    //=========================================================================
+    const Item = class {
+        constructor(title) {
+            this.title = title;
+            this._description = "";
+            this._dueDate = null;
+            this._completionDate = null;
+            this._priority = Priority.SEMI_IMPORTANT;
+        }
 
-//=============================================================================
-// To-Do Item
-//=============================================================================
-
-todo.Item = function(title) {
-    this.title = title;
-    this._description = "";
-    this._dueDate = null;
-    this._completionDate = null;
-    this._priority = todo.Priority.SEMI_IMPORTANT;
-};
-
-Object.defineProperties(todo.Item.prototype, {
-    completionDate: {
-        get: function() { return this._completionDate; },
-        set: function(value) {
-            // Null is valid; it means the task has not been completed.
-            if (null === value || undefined === value) {
+        get completionDate() {
+            return this._completionDate;
+        }
+        set completionDate(d) {
+            if (null === d || undefined === d) {
                 this._completionDate = null;
             } else {
-                this._completionDate = new Date(value);
+                this._completionDate = new Date(d);
             }
         }
-    },
-    description: {
-        get: function() { return this._description; },
-        set: function(value) { this._description = value; },
-        enumerable: true,
-    },
-    dueDate: {
-        get: function() { return this._dueDate; },
-        set: function(value) {
-            // Null is valid; it means there is no due date.
-            if (null === value || undefined === value) {
+
+        get description() {
+            return this._description;
+        }
+        set description(str) {
+            this._description = str;
+        }
+
+        get dueDate() {
+            return this._dueDate;
+        }
+        set dueDate(d) {
+            if (null === d || undefined === d) {
                 this._dueDate = null;
             } else {
-                this._dueDate = new Date(value);
+                this._dueDate = new Date(d);
             }
-        },
-        enumerable: true,
-    },
-    priority: {
-        get: function() { return this._priority; },
-        set: function(value) {
-            if (value in Object.values(todo.Priority)) {
-                this._priority = value;
-            } else {
-                throw new Error("Unrecognized priority:", value);
-            }
-        },
-        enumerable: true,
-    },
-    title: {
-        get: function() { return this._title; },
-        set: function(value) {
-            if (!value || 0 == value.length) {
-                throw new Error("Value cannot be blank");
-            }
-            this._title = value;
         }
-    },
-});
 
-todo.Item.prototype.isComplete = function() {
-    return this.completionDate != null;
-};
+        get priority() {
+            return this._priority;
+        }
+        set priority(p) {
+            if (p in Object.values(Priority)) {
+                this._priority = p;
+            } else {
+                throw new Error("Unrecognized priority:", p);
+            }
+        }
 
-todo.Item.prototype.markComplete = function(date = null) {
-    if (null === date) {
-        date = Date.now();
-    }
-    this.completionDate = date;
-};
+        get title() {
+            return this._title;
+        }
+        set title(str) {
+            if (!str || 0 == str.length) {
+                throw new Error("Title cannot be blank");
+            }
+            this._title = str;
+        }
+    
+        isComplete() {
+            return this.completionDate != null;
+        }
+    
+        markComplete(date = null) {
+            if (null === date) {
+                date = Date.now();
+            }
+            this.completionDate = date;
+        }
+        
+        unmarkComplete() {
+            this.completionDate = null;
+        }
+    };
 
-todo.Item.prototype.unmarkComplete = function() {
-    this.completionDate = null;
-};
+    return { Priority, Item };
+})();
 
-//=============================================================================
+//=========================================================================
 // Project
-//=============================================================================
+//=========================================================================
 
 // !!!
 
