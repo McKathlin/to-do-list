@@ -23,7 +23,10 @@ const MainPageController = (function() {
     const projectDescriptionNode =
         document.getElementById("current-project-description");
 
-    const listContainerNode = document.getElementById("list-container");
+    const taskListContainerNode =
+        document.getElementById("task-list-container");
+    const completedListContainerNode =
+        document.getElementById("completed-list-container");
 
     // Public methods
 
@@ -50,6 +53,7 @@ const MainPageController = (function() {
         _renderProjects();
         _renderCurrentProjectInfo();
         _renderToDoList();
+        _renderCompletedTasks();
     };
 
     // Private helper methods
@@ -76,9 +80,9 @@ const MainPageController = (function() {
     };
 
     const _renderToDoList = function() {
-        listContainerNode.replaceChildren();
+        taskListContainerNode.replaceChildren();
         for (const task of _currentProject.actionTasks) {
-            listContainerNode.appendChild(_makeToDoNode(task));
+            taskListContainerNode.appendChild(_makeToDoNode(task));
         }
     };
 
@@ -94,6 +98,20 @@ const MainPageController = (function() {
             buttonComplete,
         ]);
         return toDoNode;
+    };
+
+    const _renderCompletedTasks = function(task) {
+        completedListContainerNode.replaceChildren();
+        for (const task of _currentProject.completedTasks) {
+            completedListContainerNode.appendChild(_makeCompletedNode(task));
+        }
+    };
+
+    const _makeCompletedNode = function(task) {
+        const taskNode = doc.make(".completed-task", [
+            doc.p(task.title)
+        ]);
+        return taskNode;
     };
 
     return {
