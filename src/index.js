@@ -4,7 +4,6 @@ import doc from "./lib/doc.js";
 import todo from "./todo.js";
 
 const allProjects = [];
-allProjects.push(new todo.Project("Project 1"));
 
 //=============================================================================
 // Main Page
@@ -12,10 +11,18 @@ allProjects.push(new todo.Project("Project 1"));
 
 const MainPageController = (function() {
     // Variables
+
     let _currentProject = allProjects[0];
 
     // Nodes
+
     const projectListNode = document.getElementById("project-list");
+
+    const projectNameNode =
+        document.getElementById("current-project-name");
+    const projectDescriptionNode =
+        document.getElementById("current-project-description");
+
     const listContainerNode = document.getElementById("list-container");
 
     // Public methods
@@ -33,10 +40,11 @@ const MainPageController = (function() {
 
     const refresh = function() {
         _renderProjects();
+        _renderCurrentProjectInfo();
         _renderToDoList();
     };
 
-    // Privat helper methods
+    // Private helper methods
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
@@ -52,6 +60,11 @@ const MainPageController = (function() {
             setProject(project);
         });
         return button;
+    }
+
+    const _renderCurrentProjectInfo = function() {
+        projectNameNode.innerText = _currentProject.name;
+        projectDescriptionNode.innerText = _currentProject.description;
     }
 
     const _renderToDoList = function() {
@@ -93,9 +106,9 @@ const NewProjectFormController = (function() {
 
     const newProjectDialog = document.getElementById("new-project-dialog");
     const newProjectForm = document.getElementById("new-project-form");
-    const projectNameInput = document.getElementById("project-name");
+    const projectNameInput = document.getElementById("new-project-name");
     const projectDescriptionInput = document.getElementById(
-        "project-description");
+        "new-project-description");
     const newProjectSubmit = document.getElementById("new-project-submit");
     const newProjectCancel = document.getElementById("new-project-cancel");
 
@@ -145,4 +158,5 @@ const NewProjectFormController = (function() {
     };
 })();
 
-MainPageController.refresh();
+NewProjectFormController.addProject(
+    "Default Project", "This is a sample project.");

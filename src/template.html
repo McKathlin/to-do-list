@@ -24,16 +24,25 @@
             <form id="new-project-form" class="hidden">
                 <label for="project-name">Project name:</label>
                 <input
-                    id="project-name"
-                    name="project-name"
+                    id="new-project-name"
+                    name="new-project-name"
                     title="Please enter a project name."
                     type="text"
                     required>
-                <label for="project-description">Desciption:</label>
-                <textarea id="project-description" name="project-description"></textarea>
+                <label for="new-project-description">Desciption:</label>
+                <textarea
+                    id="new-project-description"
+                    name="new-project-description">
+                </textarea>
                 <button type="submit" id="new-project-submit">Create Project</button>
                 <button type="button" id="new-project-cancel">Cancel</button>
             </form>
+        </div>
+        <div id="project-info">
+            <h2 id="current-project-name">Loading...</h2>
+            <p id="current-project-description">
+                Please wait while your current project loads.
+            </p>
         </div>
         <div id="list-container">
             <!--View the current project here.-->
