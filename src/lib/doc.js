@@ -1,4 +1,5 @@
 // doc.js
+// by McKathlin
 // A module that makes HTML element creation quicker and tighter
 
 const doc = (function() {
@@ -12,14 +13,11 @@ const doc = (function() {
     ]);
 
     function make(selector, properties) {
-        if (selector == "label") {
-            console.log("Label properties");
-            console.log(properties);
-        }
         // Standardize properties object
         if (!properties) {
             if ("object" == typeof selector) {
                 properties = selector;
+                selector = null;
             } else {
                 properties = {};
             }
@@ -32,8 +30,14 @@ const doc = (function() {
         }
 
         // Make an element of the specified type.
-        const typeCapture = selector.match(_typeRegex);
-        let type = typeCapture ? typeCapture[1] : "div";
+        let type = "div";
+        if (typeof selector == "string") {
+            const typeCapture = selector.match(_typeRegex);
+            if (typeCapture && typeCapture[1]) {
+                type = typeCapture[1];
+            }
+        }
+        
         let element = document.createElement(type);
 
         // Set the id, if any.
