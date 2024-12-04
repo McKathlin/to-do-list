@@ -9,7 +9,7 @@ const todo = (function() {
     // Private variables
     //=========================================================================
     let _nextProjectId = 1;
-    let _nextItemId = 100;
+    let _nextTaskId = 100;
 
     //=========================================================================
     // Priority
@@ -23,16 +23,16 @@ const todo = (function() {
     });
 
     //=========================================================================
-    // To-Do Item
+    // Task
     //=========================================================================
-    const Item = class {
+    const Task = class {
         // Init
         constructor(properties) {
             if (typeof properties == "string") {
                 let title = properties;
                 properties = { title };
             }
-            this._id = _nextItemId++;
+            this._id = _nextTaskId++;
             this.title = properties.title;
             this.description = properties.description ?? "";
             this.dueDate = properties.dueDate ?? null;
@@ -116,7 +116,7 @@ const todo = (function() {
 
     //=========================================================================
     // Project
-    // Holds a list of related to-do items
+    // Holds a list of related tasks
     //=========================================================================
 
     const Project = class {
@@ -151,33 +151,33 @@ const todo = (function() {
             this._description = str;
         }
 
-        get allItems() {
+        get allTaskss() {
             return this._list.slice();
         }
 
-        get actionItems() {
+        get actionTasks() {
             return this._list.filter(item => !item.isComplete());
         }
 
-        get completedItems() {
+        get completedTasks() {
             return this._list.filter(item => item.isComplete());
         }
 
         // Methods
 
-        addItem(properties) {
+        addTask(properties) {
             if (typeof properties == "string") {
                 let title = properties;
                 properties = { title };
             }
-            let item = new Item(properties);
+            let item = new Task(properties);
             this._list.push(item);
         }
 
-        removeItem(criteria) {
+        removeTask(criteria) {
             let NOT_FOUND = -1;
-            if (criteria instanceof Item) {
-                let index = this._list.indexOf(itemInfo);
+            if (criteria instanceof Task) {
+                let index = this._list.indexOf(criteria);
                 if (index != NOT_FOUND) {
                     this._list.splice(index, 1);
                     return true;
@@ -208,7 +208,7 @@ const todo = (function() {
         }
     };
 
-    return { Project, Item, Priority };
+    return { Project, Task, Priority };
 })();
 
 export default todo;

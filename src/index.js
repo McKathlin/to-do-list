@@ -6,7 +6,7 @@ import todo from "./todo.js";
 const allProjects = [];
 
 //=============================================================================
-// Main Page
+// Main Page Controller
 //=============================================================================
 
 const MainPageController = (function() {
@@ -35,9 +35,9 @@ const MainPageController = (function() {
         }
     };
 
-    const markComplete = function(item) {
-        console.log(`${item.title} complete!`);
-        item.markComplete();
+    const markComplete = function(task) {
+        console.log(`${task.title} complete!`);
+        task.markComplete();
         refresh();
     };
 
@@ -77,20 +77,20 @@ const MainPageController = (function() {
 
     const _renderToDoList = function() {
         listContainerNode.replaceChildren();
-        for (const item of _currentProject.actionItems) {
-            listContainerNode.appendChild(_makeToDoNode(item));
+        for (const task of _currentProject.actionTasks) {
+            listContainerNode.appendChild(_makeToDoNode(task));
         }
     };
 
-    const _makeToDoNode = function(item) {
+    const _makeToDoNode = function(task) {
         const buttonComplete = doc.make("button.complete-button", "Done!");
         buttonComplete.addEventListener("click", function(event) {
-            markComplete(item);
+            markComplete(task);
         });
 
-        const toDoNode = doc.make(".to-do-item", [
-            doc.h3(item.title),
-            doc.p(item.description),
+        const toDoNode = doc.make(".task", [
+            doc.h3(task.title),
+            doc.p(task.description),
             buttonComplete,
         ]);
         return toDoNode;
@@ -105,7 +105,7 @@ const MainPageController = (function() {
 })();
 
 //=============================================================================
-// New Project Form
+// New Project Form Controller
 //=============================================================================
 
 const NewProjectFormController = (function() {
@@ -155,7 +155,7 @@ const NewProjectFormController = (function() {
 
     const addProject = function(name, description = "") {
         let project = new todo.Project(name, description);
-        project.addItem("Add to-do items");
+        project.addTask("Add to-do items");
         allProjects.push(project);
         MainPageController.setProject(project);
     };
@@ -167,7 +167,15 @@ const NewProjectFormController = (function() {
     };
 })();
 
+//=============================================================================
+// Project Edit Controller
+//=============================================================================
+
 const ProjectEditController = (function() {
+    // !!! add project edit mode
+
+    // !!! add project edit form
+
     const removeProject = function(id) {
         let removalIndex = allProjects.findIndex((proj) => proj.id == id);
         if (removalIndex >= 0) {
@@ -178,6 +186,19 @@ const ProjectEditController = (function() {
 
     return {
         removeProject
+    };
+})();
+
+//=============================================================================
+// New Task Form Controller
+//=============================================================================
+
+const NewTaskFormController = (function() {
+    // !!! Set up new task form
+    // !!! Process new task form
+
+    return {
+        // !!!
     };
 })();
 
