@@ -48,6 +48,33 @@
         <div id="task-list-container">
             <!--View the current project's to-do list here.-->
         </div>
+        <div id="new-task-container">
+            <button id="new-task-show-button">Add Task</button>
+            <div id="new-task-dialog">
+                <form id="new-task-form">
+                    <label for="new-task-title">Title:</label>
+                    <input id="new-task-title"
+                        name="new-task-title"
+                        type="text"
+                        required>
+                    <label for="new-task-description">Description:</label>
+                    <textarea id="new-task-description" name="new-task-description">
+                    </textarea>
+                    <label for="new-task-priority">Priority:</label>
+                    <select id="new-task-priority" name="new-task-priority">
+                        <option value="1">Most Important</option>
+                        <option value="2">Important</option>
+                        <option value="3" selected>Default</option>
+                        <option value="4">Not Important</option>
+                    </select>
+                    <label for="new-task-due-date">Due Date:</label>
+                    <input id="new-task-due-date"
+                        name="new-task-due-date"
+                        type="date">
+                    <button type="submit">Add Task</button>
+                </form>
+            </div>
+        </div>
         <h3>Finished Tasks</h3>
         <div id="completed-list-container">
             <!--View completed tasks here.-->

@@ -25,6 +25,7 @@ const MainPageController = (function() {
 
     const taskListContainerNode =
         document.getElementById("task-list-container");
+
     const completedListContainerNode =
         document.getElementById("completed-list-container");
 
@@ -212,6 +213,25 @@ const ProjectEditController = (function() {
 //=============================================================================
 
 const NewTaskFormController = (function() {
+    const newTaskContainerNode =
+        document.getElementById("new-task-container");
+    const newTaskShowButton =
+        document.getElementById("new-task-show-button");
+
+    const newTaskDialog =
+        document.getElementById("new-task-dialog");
+    const newTaskForm =
+        document.getElementById("new-task-form");
+    const newTaskTitleInput =
+        document.getElementById("new-task-title");
+    const newTaskDescriptionInput =
+        document.getElementById("new-task-description");
+    const newTaskPriorityInput =
+        document.getElementById("new-task-priority");
+    const newTaskDueDateInput =
+        document.getElementById("new-task-due-date");
+    const newTaskSubmitButton =
+        document.getElementById("new-task-submit");
     // !!! Set up new task form
     // !!! Process new task form
 
