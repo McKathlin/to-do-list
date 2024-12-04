@@ -12,7 +12,7 @@ const allProjects = [];
 const MainPageController = (function() {
     // Variables
 
-    let _currentProject = allProjects[0];
+    let _currentProject = null;
 
     // Nodes
 
@@ -27,8 +27,16 @@ const MainPageController = (function() {
 
     // Public methods
 
+    const onStartup = function() {
+        if (allProjects.length > 0) {
+            setProject(allProjects[0]);
+        } else {
+            NewProjectFormController.showDialog();
+        }
+    };
+
     const markComplete = function(item) {
-        console.log(item.title);
+        console.log(`${item.title} complete!`);
         item.markComplete();
         refresh();
     };
@@ -60,12 +68,12 @@ const MainPageController = (function() {
             setProject(project);
         });
         return button;
-    }
+    };
 
     const _renderCurrentProjectInfo = function() {
         projectNameNode.innerText = _currentProject.name;
         projectDescriptionNode.innerText = _currentProject.description;
-    }
+    };
 
     const _renderToDoList = function() {
         listContainerNode.replaceChildren();
@@ -89,6 +97,7 @@ const MainPageController = (function() {
     };
 
     return {
+        onStartup,
         markComplete,
         setProject,
         refresh
@@ -158,5 +167,22 @@ const NewProjectFormController = (function() {
     };
 })();
 
+const ProjectEditController = (function() {
+    const removeProject = function(id) {
+        let removalIndex = allProjects.findIndex((proj) => proj.id == id);
+        if (removalIndex >= 0) {
+            allProjects.splice(removalIndex, 1);
+            MainPageController.onStartup();
+        }
+    };
+
+    return {
+        removeProject
+    };
+})();
+
 NewProjectFormController.addProject(
     "Default Project", "This is a sample project.");
+NewProjectFormController.addProject(
+    "Cool Game", "I have a great idea for a game!");
+MainPageController.onStartup();

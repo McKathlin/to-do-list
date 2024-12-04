@@ -6,6 +6,12 @@
 
 const todo = (function() {
     //=========================================================================
+    // Private variables
+    //=========================================================================
+    let _nextProjectId = 1;
+    let _nextItemId = 100;
+
+    //=========================================================================
     // Priority
     //=========================================================================
 
@@ -26,6 +32,7 @@ const todo = (function() {
                 let title = properties;
                 properties = { title };
             }
+            this._id = _nextItemId++;
             this.title = properties.title;
             this.description = properties.description ?? "";
             this.dueDate = properties.dueDate ?? null;
@@ -34,6 +41,11 @@ const todo = (function() {
         }
 
         // Properties
+
+        get id() {
+            return this._id;
+        }
+
         get completionDate() {
             return this._completionDate;
         }
@@ -85,6 +97,7 @@ const todo = (function() {
         }
     
         // Methods
+
         isComplete() {
             return this.completionDate != null;
         }
@@ -109,12 +122,17 @@ const todo = (function() {
     const Project = class {
         // Init
         constructor(name, description = "") {
+            this._id = _nextProjectId++;
             this.name = name;
             this.description = description;
             this._list = [];
         }
 
         // Properties
+
+        get id() {
+            return this._id;
+        }
 
         get name() {
             return this._name;
@@ -154,6 +172,39 @@ const todo = (function() {
             }
             let item = new Item(properties);
             this._list.push(item);
+        }
+
+        removeItem(criteria) {
+            let NOT_FOUND = -1;
+            if (criteria instanceof Item) {
+                let index = this._list.indexOf(itemInfo);
+                if (index != NOT_FOUND) {
+                    this._list.splice(index, 1);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            
+            if (typeof criteria == "number") {
+                let id = criteria;
+                criteria = { id };
+            } else if (typeof criteria == "string") {
+                let title = criteria;
+                criteria = { title };
+            } else if (!criteria) {
+                // Can't remove a null or undefined value.
+                return false;
+            }
+
+            let removalIndex = this._list.findIndex((element) => {
+                for (key in criteria) {
+                    if (element[key] != criteria[key]) {
+                        return false;
+                    }
+                }
+                return true;
+            });
         }
     };
 
