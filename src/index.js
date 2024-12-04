@@ -5,25 +5,101 @@ import todo from "./todo.js";
 
 const allProjects = [];
 allProjects.push(new todo.Project("Project 1"));
-allProjects.push(new todo.Project("Project 2"));
+
+//=============================================================================
+// Site Controller
+//=============================================================================
 
 const SiteController = (function() {
-    const listContainerNode = document.getElementById("list-container");
-    const projectListNode = document.getElementById("project-list");
-
+    //-------------------------------------------------------------------------
+    // Variables
+    //-------------------------------------------------------------------------
     let currentProject = allProjects[0];
-    currentProject.addItem({
-        title: "Do the thing",
-        description: "This thing needs to be done NOW!",
-        priority: todo.Priority.MOST_IMPORTANT,
-        dueDate: Date.now(),
+
+    //-------------------------------------------------------------------------
+    // Nodes
+    //-------------------------------------------------------------------------
+
+    // Projects tab
+    const projectListNode = document.getElementById("project-list");
+    const newProjectShowButton = document.getElementById(
+        "new-project-button");
+
+    // To-do list area
+    const listContainerNode = document.getElementById("list-container");
+
+    // New project dialog
+    const newProjectDialog = document.getElementById("new-project-dialog");
+    const newProjectForm = document.getElementById("new-project-form");
+    const projectNameInput = document.getElementById("project-name");
+    const projectDescriptionInput = document.getElementById(
+        "project-description");
+    const newProjectSubmit = document.getElementById("new-project-submit");
+    const newProjectCancel = document.getElementById("new-project-cancel");
+
+    //-------------------------------------------------------------------------
+    // Setup
+    //-------------------------------------------------------------------------
+
+    newProjectShowButton.addEventListener("click", function(event) {
+        showNewProjectForm();
     });
-    currentProject.addItem("Try another thing");
+
+    newProjectSubmit.addEventListener("click", function(event) {
+        if (newProjectForm.checkValidity()) {
+            event.preventDefault();
+            const name = projectNameInput.value;
+            const description = projectDescriptionInput.value;
+            addProject(name, description);
+            hideNewProjectForm();
+        }
+    });
+
+    newProjectCancel.addEventListener("click", function(event) {
+        hideNewProjectForm();
+    });
+
+    //-------------------------------------------------------------------------
+    // Public controller methods
+    //-------------------------------------------------------------------------
 
     const refresh = function() {
         _renderProjects();
         _renderToDoList();
     };
+
+    const markComplete = function(item) {
+        console.log(item.title);
+        item.markComplete();
+        refresh();
+    };
+
+    const setProject = function(project) {
+        currentProject = project;
+        refresh();
+    };
+
+    const showNewProjectForm = function() {
+        newProjectDialog.classList.remove("hidden");
+    };
+
+    const hideNewProjectForm = function() {
+        newProjectDialog.classList.add("hidden");
+        projectNameInput.value = "";
+        projectDescriptionInput.value = "";
+    };
+
+    const addProject = function(name, description = "") {
+        let project = new todo.Project(name, description);
+        project.addItem("Add to-do items");
+        allProjects.push(project);
+        currentProject = project;
+        refresh();
+    };
+
+    //-------------------------------------------------------------------------
+    // Private helper methods
+    //-------------------------------------------------------------------------
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
@@ -36,8 +112,7 @@ const SiteController = (function() {
     const _makeProjectNode = function(project) {
         let button = doc.make("button.project", project.name);
         button.addEventListener("click", function(event) {
-            currentProject = project;
-            refresh();
+            setProject(project);
         });
         return button;
     }
@@ -52,13 +127,11 @@ const SiteController = (function() {
     const _makeToDoNode = function(item) {
         const buttonComplete = doc.make("button.complete-button", "Done!");
         buttonComplete.addEventListener("click", function(event) {
-            console.log(item.title);
-            item.markComplete();
-            refresh();
+            markComplete(item);
         });
 
         const toDoNode = doc.make(".to-do-item", [
-            doc.h2(item.title),
+            doc.h3(item.title),
             doc.p(item.description),
             buttonComplete,
         ]);
@@ -67,7 +140,8 @@ const SiteController = (function() {
 
     return {
         currentProject,
-        refresh
+        refresh,
+        markComplete,
     };
 })();
 

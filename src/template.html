@@ -14,12 +14,27 @@
 
             </menu>
             <menu id="project-actions">
-                <!--Add Project button-->
-                <!--Edit Project button-->
+                <button id="new-project-button">New Project</button>
+                <button id="edit-projects-button">Edit Projects</button>
             </menu>
         </nav>
     </header>
     <main>
+        <div id="new-project-dialog">
+            <form id="new-project-form" class="hidden">
+                <label for="project-name">Project name:</label>
+                <input
+                    id="project-name"
+                    name="project-name"
+                    title="Please enter a project name."
+                    type="text"
+                    required>
+                <label for="project-description">Desciption:</label>
+                <textarea id="project-description" name="project-description"></textarea>
+                <button type="submit" id="new-project-submit">Create Project</button>
+                <button type="button" id="new-project-cancel">Cancel</button>
+            </form>
+        </div>
         <div id="list-container">
             <!--View the current project here.-->
         </div>
