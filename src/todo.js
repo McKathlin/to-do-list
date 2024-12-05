@@ -208,7 +208,60 @@ const todo = (function() {
         }
     };
 
-    return { Project, Task, Priority };
+    //=========================================================================
+    // Workspace
+    // This singleton persists a list of objects
+    //=========================================================================
+
+    const Workspace = (function() {
+        let _defaultProject = new Project("Default Project", "");
+        let _projects = [];
+        let _currentProjectIndex = null;
+
+        const getProjects = function() {
+            return _projects.slice();
+        };
+
+        const getCurrentProject = function() {
+            return _projects[_currentProjectIndex];
+        };
+
+        const setCurrentProject = function(project) {
+            let index = _projects.find(project);
+            if (index >= 0) {
+                _currentProjectIndex = index;
+                return true;
+            } else {
+                return false;
+            }
+        };
+
+        const addProject = function(name, description = "") {
+            let project = new Project(name, description);
+            project.addTask("Add to-do items");
+            _projects.push(project);
+        };
+
+        const removeProject = function(project) {
+            let removalIndex = _projects.find(project);
+            if (removalIndex >= 0) {
+                _projects.splice(removalIndex, 1);
+                return true;
+            } else {
+                return false;
+            }
+        };
+        
+        return {
+            getProjects,
+            getCurrentProject,
+            setCurrentProject,
+            addProject,
+            removeProject,
+        }
+    })();
+
+    return { Workspace, Project, Task, Priority };
 })();
 
 export default todo;
