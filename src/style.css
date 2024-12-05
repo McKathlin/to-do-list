@@ -13,11 +13,14 @@
 body {
     --strong-text-color: #000000;
     --text-color: #303030;
+    --edge-color: #606060;
     --back-color: #eeeeee;
-    --header-back-color: #194381;
-    --header-text-color: #ffffff;
-    --create-color: #60dfb4;
     --container-back-color: #dddddd;
+
+    --header-text-color: #ffffff;
+    --header-back-color: #194381;
+    --create-color: #43caa8;
+    
     --shadow-color: #00082820;
     --dimmer-color: #00001880;
 
@@ -39,11 +42,14 @@ body {
     body {
         --strong-text-color: #f0f0e8;
         --text-color: #d0d2d4;
+        --edge-color: #64686c;
         --back-color: #303030;
-        --header-back-color: #000000;
-        --header-text-color: #88aaff;
-        --create-color: #174430;
         --container-back-color: #282828;
+
+        --header-text-color: #88b8ff;
+        --header-back-color: #000000;
+        --create-color: #1c5a50;
+
         --shadow-color: #00000040;
         --dimmer-color: #000000a0;
     }
@@ -54,16 +60,21 @@ body {
 }
 
 button {
+    display: block;
     font-family: var(--default-font);
     font-size: max(10pt, 1rem);
 
     color: var(--strong-text-color);
     background-color: var(--container-back-color);
 
-    border: 1px solid var(--text-color);
+    border: 1px solid var(--edge-color);
     border-radius: 3px;
     padding: 2px 5px;
     cursor: pointer;
+}
+
+h1, h2, h3 {
+    color: var(--strong-text-color);
 }
 
 main {
@@ -85,6 +96,7 @@ header {
 }
 
 header h1 {
+    color: var(--header-text-color);
     margin-top: 0.8rem;
 }
 
@@ -183,7 +195,7 @@ header .disclaimer {
     color: var(--text-color);
     background-color: var(--back-color);
 
-    border: 0.1rem solid var(--text-color);
+    border: 0.1rem solid var(--edge-color);
     border-radius: 0.3rem;
     box-shadow: var(--item-shadow);
 
@@ -223,19 +235,62 @@ footer {
 
 .dialog {
     background-color: var(--container-back-color);
-    padding: 1rem;
-    border-radius: 0.75rem;
-}
+    border: 2px solid var(--edge-color);
+    border-radius: calc(0.7rem + 2px);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
 
-input, textarea {
-    display: block;
-    width: 20rem;
-}
+    > * {
+        margin: 0 1rem;
+    }
 
-label {
-    display: block;
-}
+    .dialog-head {
+        margin: 0;
+        padding: 0.2rem;
+        text-align: center;
+        border-bottom: 1px solid var(--edge-color);
+        border-radius: 0.7rem 0.7rem 0 0;
+        background-color: var(--create-color);
+    }
 
-textarea {
-    resize: block;
+    input, textarea, select {
+        font-family: var(--default-font);
+        font-size: 1rem;
+        color: var(--strong-text-color);
+        background-color: var(--back-color);
+        border: 1px solid var(--edge-color);
+        line-height: 1.25rem;
+        padding: 2px;
+        display: block;
+        width: 20rem;
+    }
+    
+    label {
+        display: block;
+        margin-top: 0.5rem;
+    }
+    
+    textarea {
+        resize: block;
+        height: 4rem;
+    }
+    
+    .button-row {
+        margin: 0.5rem;
+    
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    button[type='submit'] {
+        font-weight: bold;
+        background-color: var(--create-color);
+    }
+
+    button[type='button'] {
+        background-color: var(--back-color);
+    }
 }
