@@ -17,9 +17,10 @@ body {
     --header-back-color: #194381;
     --header-text-color: #ffffff;
     --create-color: #60dfb4;
-
     --container-back-color: #dddddd;
     --shadow-color: #00082820;
+    --dimmer-color: #00001880;
+
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
     --item-shadow: 2px 2px 1px var(--shadow-color);
 
@@ -42,14 +43,14 @@ body {
         --header-back-color: #000000;
         --header-text-color: #88aaff;
         --create-color: #174430;
-
         --container-back-color: #282828;
         --shadow-color: #00000040;
+        --dimmer-color: #000000a0;
     }
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 button {
@@ -122,8 +123,10 @@ header .disclaimer {
 #project-list button.current {
     color: var(--strong-text-color);
     background-color: var(--back-color);
+
+    /* Close any seam with main area below */
     position: relative;
-    top: 1px; /* Close any seam with main area below */
+    top: 1px;
     height: calc(1.8rem + 2px);
 }
 
@@ -144,7 +147,7 @@ header .disclaimer {
     border-radius: 0.5lh;
 
     position: relative;
-    top: -3px;
+    top: -0.2rem;
 }
 
 /* Project Info Region */
@@ -199,4 +202,40 @@ header .disclaimer {
 footer {
     text-align: center;
     line-height: var(--footer-height);
+}
+
+/* Dialogs */
+
+.dialog-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 100vw;
+    height: 100vh;
+    background-color: var(--dimmer-color);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dialog {
+    background-color: var(--container-back-color);
+    padding: 1rem;
+    border-radius: 0.75rem;
+}
+
+input, textarea {
+    display: block;
+    width: 20rem;
+}
+
+label {
+    display: block;
+}
+
+textarea {
+    resize: block;
 }
