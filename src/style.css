@@ -7,7 +7,7 @@
 }
 
 :root {
-    font-size: clamp(12px, calc(8px + 1vw), 36px)
+    font-size: clamp(12px, calc(8px + 0.8vw), 36px)
 }
 
 body {
@@ -17,13 +17,16 @@ body {
     --header-text-color: #ffffff;
 
     --container-back-color: #dddddd;
-    --container-shadow: inset 1px 2px 4px 2px #00082820;
-    --item-shadow: 2px 2px 1px #00082820;
+    --shadow-color: #00082820;
+    --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
+    --item-shadow: 2px 2px 1px var(--shadow-color);
 
-    --header-height: 6.5rem;
+    --default-font: Verdana, Geneva, Tahoma, sans-serif;
+
+    --header-height: 7rem;
     --footer-height: 1.5rem;
 
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: var(--default-font);
     color: var(--text-color);
     background-color: var(--back-color);
     min-height: 100vh;
@@ -38,6 +41,13 @@ body {
 
 .hidden {
     display: none;
+}
+
+button {
+    font-family: var(--default-font);
+    font-size: max(10pt, 1rem);
+    padding: 2px 5px;
+    cursor: pointer;
 }
 
 main {
@@ -55,11 +65,11 @@ header {
 
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
 }
 
 header h1 {
     margin-top: 1rem;
-    flex: 1;
 }
 
 /* Project List Nav */
@@ -80,6 +90,13 @@ header nav {
     flex-direction: row;
     justify-content: flex-start;
     gap: 1rem;
+}
+
+#project-list button {
+    font-weight: bold;
+    min-width: 8ch;
+    border: none;
+    border-radius: 0.5rem 0.5rem 0 0;
 }
 
 /* Project Info Region */
