@@ -6,11 +6,19 @@
     box-sizing: border-box;
 }
 
+:root {
+    font-size: clamp(12px, calc(8px + 1vw), 36px)
+}
+
 body {
     --text-color: #222222;
     --back-color: #eeeeee;
     --header-back-color: #194381;
     --header-text-color: #ffffff;
+
+    --container-back-color: #dddddd;
+    --container-shadow: inset 1px 2px 4px 2px #00082820;
+    --item-shadow: 2px 2px 1px #00082820;
 
     --header-height: 6.5rem;
     --footer-height: 1.5rem;
@@ -33,17 +41,16 @@ body {
 }
 
 main {
-    padding: 1rem;
+    padding: 0.5rem 1rem;
     min-height: calc(100vh - var(--header-height) - var(--footer-height));
 }
 
 /* Title Heading */
 
 header {
-    height: var(--header-height);
-
     color: var(--header-text-color);
     background-color: var(--header-back-color);
+    height: var(--header-height);
     text-align: center;
 
     display: flex;
@@ -89,8 +96,9 @@ header nav {
 }
 
 #task-list-container {
-    color: var(--header-text-color);
-    background-color: var(--header-back-color);
+    background-color: var(--container-back-color);
+    box-shadow: var(--container-shadow);
+
     max-width: 40rem;
     margin: auto;
     padding: 0.5rem;
@@ -106,8 +114,11 @@ header nav {
 #task-list-container .task {
     color: var(--text-color);
     background-color: var(--back-color);
+
     border: 0.1rem solid var(--text-color);
     border-radius: 0.3rem;
+    box-shadow: var(--item-shadow);
+
     padding: 0.2rem;
     padding-left: 1ch;
     width: 100%;
