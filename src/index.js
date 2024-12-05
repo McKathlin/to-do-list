@@ -66,6 +66,11 @@ const MainPageController = (function() {
 
     const _makeProjectNode = function(project) {
         let button = doc.make("button.project", project.name);
+        if (project == currentProject) {
+            button.classList.add("current");
+        } else {
+            button.classList.add("other");
+        }
         button.addEventListener("click", function(event) {
             setProject(project);
         });
