@@ -106,8 +106,10 @@ const doc = (function() {
     const module = { make };
 
     const _shortcuts = [
-        "a", "button", "div", "em", "h1", "h2", "h3", "fieldset", "img", "input",
-        "label", "li", "menu", "ol", "p", "span", "strong", "textarea", "ul",
+        "a", "button", "div", "em",
+        "h1", "h2", "h3", "h4", "h5", "h6",
+        "fieldset", "img", "input", "label", "li", "menu", "ol",
+        "p", "span", "strong", "textarea", "ul",
     ];
     for (const shortcut of _shortcuts) {
         module[shortcut] = _elementClosure(shortcut);
