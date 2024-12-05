@@ -19,8 +19,9 @@
         </nav>
     </header>
     <main>
-        <div id="new-project-dialog" class="hidden">
-            <form id="new-project-form">
+        <div id="new-project-dialog" class="hidden dialog-container">
+            <form id="new-project-form" class="dialog">
+                <h2 class="dialog-head">Create Project</h2>
                 <label for="project-name">Project name:</label>
                 <input
                     id="new-project-name"
@@ -33,8 +34,10 @@
                     id="new-project-description"
                     name="new-project-description">
                 </textarea>
-                <button type="submit" id="new-project-submit">Create Project</button>
-                <button type="button" id="new-project-cancel">Cancel</button>
+                <div class="button-row">
+                    <button type="submit" id="new-project-submit">Create</button>
+                    <button type="button" id="new-project-cancel">Cancel</button>
+                </div>
             </form>
         </div>
         <div id="project-info">
@@ -51,8 +54,9 @@
         </div>
         <div id="new-task-container">
             <button id="new-task-show-button">Add Task</button>
-            <div id="new-task-dialog" class="hidden">
-                <form id="new-task-form">
+            <div id="new-task-dialog" class="hidden dialog-container">
+                <form id="new-task-form" class="dialog">
+                    <h2 class="dialog-head">Create Task</h2>
                     <label for="new-task-title">Title:</label>
                     <input id="new-task-title"
                         name="new-task-title"
