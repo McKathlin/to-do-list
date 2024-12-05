@@ -3,9 +3,6 @@ import "./style.css";
 import doc from "./lib/doc.js";
 import todo from "./todo.js";
 
-const allProjects = [];
-let currentProject = null;
-
 //=============================================================================
 // Main Page Controller
 //=============================================================================
@@ -28,14 +25,6 @@ const MainPageController = (function() {
 
     // Public methods
 
-    const onStartup = function() {
-        if (allProjects.length > 0) {
-            setProject(allProjects[0]);
-        } else {
-            NewProjectFormController.showDialog();
-        }
-    };
-
     const markComplete = function(task) {
         console.log(`${task.title} complete!`);
         task.markComplete();
@@ -43,7 +32,7 @@ const MainPageController = (function() {
     };
 
     const setProject = function(project) {
-        currentProject = project;
+        todo.Workspace.currentProject = project;
         refresh();
     };
 
@@ -58,7 +47,7 @@ const MainPageController = (function() {
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
-        for (const project of allProjects) {
+        for (const project of todo.Workspace.projects) {
             let projectNode = _makeProjectNode(project);
             projectListNode.appendChild(projectNode);
         }
@@ -66,7 +55,7 @@ const MainPageController = (function() {
 
     const _makeProjectNode = function(project) {
         let button = doc.make("button.project", project.name);
-        if (project == currentProject) {
+        if (project == todo.Workspace.currentProject) {
             button.classList.add("current");
         } else {
             button.classList.add("other");
@@ -78,13 +67,14 @@ const MainPageController = (function() {
     };
 
     const _renderCurrentProjectInfo = function() {
-        projectNameNode.innerText = currentProject.name;
-        projectDescriptionNode.innerText = currentProject.description;
+        let project = todo.Workspace.currentProject;
+        projectNameNode.innerText = project.name;
+        projectDescriptionNode.innerText = project.description;
     };
 
     const _renderToDoList = function() {
         taskListContainerNode.replaceChildren();
-        for (const task of currentProject.actionTasks) {
+        for (const task of todo.Workspace.currentProject.actionTasks) {
             taskListContainerNode.appendChild(_makeToDoNode(task));
         }
     };
@@ -107,7 +97,7 @@ const MainPageController = (function() {
 
     const _renderCompletedTasks = function(task) {
         completedListContainerNode.replaceChildren();
-        for (const task of currentProject.completedTasks) {
+        for (const task of todo.Workspace.currentProject.completedTasks) {
             completedListContainerNode.appendChild(_makeCompletedNode(task));
         }
     };
@@ -120,7 +110,6 @@ const MainPageController = (function() {
     };
 
     return {
-        onStartup,
         markComplete,
         setProject,
         refresh
@@ -178,9 +167,7 @@ const NewProjectFormController = (function() {
     };
 
     const addProject = function(name, description = "") {
-        let project = new todo.Project(name, description);
-        project.addTask("Add to-do items");
-        allProjects.push(project);
+        let project = todo.Workspace.addProject(name, description);
         MainPageController.setProject(project);
     };
 
@@ -200,11 +187,9 @@ const ProjectEditController = (function() {
 
     // !!! add project edit form
 
-    const removeProject = function(id) {
-        let removalIndex = allProjects.findIndex((proj) => proj.id == id);
-        if (removalIndex >= 0) {
-            allProjects.splice(removalIndex, 1);
-            MainPageController.onStartup();
+    const removeProject = function(project) {
+        if (todo.Workspace.removeProject(project)) {
+            MainPageController.refresh();
         }
     };
 
@@ -281,7 +266,7 @@ const NewTaskFormController = (function() {
     };
 
     const addTask = function(properties) {
-        currentProject.addTask(properties);
+        todo.Workspace.currentProject.addTask(properties);
         MainPageController.refresh();
     };
 
@@ -292,8 +277,4 @@ const NewTaskFormController = (function() {
     };
 })();
 
-NewProjectFormController.addProject(
-    "Default Project", "This is a sample project.");
-NewProjectFormController.addProject(
-    "Cool Game", "I have a great idea for a game!");
-MainPageController.onStartup();
+MainPageController.refresh();

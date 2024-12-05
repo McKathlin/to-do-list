@@ -214,36 +214,47 @@ const todo = (function() {
     //=========================================================================
 
     const Workspace = (function() {
-        let _defaultProject = new Project("Default Project", "");
-        let _projects = [_defaultProject];
+        let _projects = [];
         let _currentProjectIndex = 0;
 
-        const getProjects = function() {
-            return _projects.slice();
-        };
+        const singleton = {};
 
-        const getCurrentProject = function() {
-            return _projects[_currentProjectIndex];
-        };
-
-        const setCurrentProject = function(project) {
-            let index = _projects.find(project);
-            if (index >= 0) {
-                _currentProjectIndex = index;
-                return true;
-            } else {
-                return false;
+        Object.defineProperties(singleton, {
+            projects: {
+                get: function() {
+                    return _projects.slice();
+                }
+            },
+            currentProject: {
+                get: function() {
+                    if (_currentProjectIndex < _projects.length) {
+                        return _projects[_currentProjectIndex];
+                    } else {
+                        return null;
+                    }
+                },
+                set: function(project) {
+                    console.log("Attempting to set project")
+                    console.log(project);
+                    let index = _projects.indexOf(project);
+                    if (index >= 0) {
+                        _currentProjectIndex = index;
+                    } else {
+                        throw new Error("Can't set project not in list!");
+                    }
+                }
             }
-        };
+        });
 
-        const addProject = function(name, description = "") {
+        singleton.addProject = function(name, description = "") {
             let project = new Project(name, description);
             project.addTask("Add to-do items");
             _projects.push(project);
+            return project;
         };
 
-        const removeProject = function(project) {
-            let removalIndex = _projects.find(project);
+        singleton.removeProject = function(project) {
+            let removalIndex = _projects.indexOf(project);
             if (removalIndex >= 0) {
                 _projects.splice(removalIndex, 1);
                 return true;
@@ -251,14 +262,9 @@ const todo = (function() {
                 return false;
             }
         };
-        
-        return {
-            getProjects,
-            getCurrentProject,
-            setCurrentProject,
-            addProject,
-            removeProject,
-        }
+
+        singleton.addProject("Default Project", "");
+        return singleton;
     })();
 
     return { Workspace, Project, Task, Priority };
