@@ -19,76 +19,76 @@
         </nav>
     </header>
     <main>
-        <div id="new-project-dialog" class="hidden dialog-container">
-            <form id="new-project-form" class="dialog">
-                <h2 class="dialog-head">Create Project</h2>
-                <label for="project-name">Project name:</label>
-                <input
-                    id="new-project-name"
-                    name="new-project-name"
-                    title="Please enter a project name."
-                    type="text"
-                    required>
-                <label for="new-project-description">Description:</label>
-                <textarea
-                    id="new-project-description"
-                    name="new-project-description">
-                </textarea>
-                <div class="button-row">
-                    <button type="submit" id="new-project-submit">Create</button>
-                    <button type="button" id="new-project-cancel">Cancel</button>
-                </div>
-            </form>
-        </div>
-        <div id="project-info">
+        <section id="project-info-section">
             <h2 id="current-project-name">Loading...</h2>
             <p id="current-project-description">
                 Please wait while your current project loads.
             </p>
-        </div>
-        <div id="task-list-region">
+        </section>
+        <section id="task-list-section">
             <h3>To Do</h3>
             <div id="task-list-container">
                 <!--View the current project's to-do list here.-->
             </div>
-        </div>
-        <div id="new-task-container">
             <button id="new-task-show-button">Add Task</button>
-            <div id="new-task-dialog" class="hidden dialog-container">
-                <form id="new-task-form" class="dialog">
-                    <h2 class="dialog-head">Create Task</h2>
-                    <label for="new-task-title">Title:</label>
-                    <input id="new-task-title"
-                        name="new-task-title"
-                        type="text"
-                        required>
-                    <label for="new-task-description">Description:</label>
-                    <textarea id="new-task-description" name="new-task-description"></textarea>
-                    <label for="new-task-priority">Priority:</label>
-                    <select id="new-task-priority" name="new-task-priority">
-                        <option value="1">Most Important</option>
-                        <option value="2">Important</option>
-                        <option value="3" selected>Default</option>
-                        <option value="4">Not Important</option>
-                    </select>
-                    <label for="new-task-due-date">Due Date:</label>
-                    <input id="new-task-due-date"
-                        name="new-task-due-date"
-                        type="date">
-                    <div class="button-row">
-                        <button id="new-task-submit" type="submit">Add Task</button>
-                        <button id="new-task-cancel" type="button">Cancel</button>
-                    </div>
-                </form>
+        </section>
+        <section id="completed-task-section">
+            <h3>Finished Tasks</h3>
+            <div id="completed-list-container">
+                <!--View completed tasks here.-->
             </div>
-        </div>
-        <h3>Finished Tasks</h3>
-        <div id="completed-list-container">
-            <!--View completed tasks here.-->
-        </div>
+        </section>
     </main>
     <footer>
         <p>Made by <a href="https://github.com/mckathlin">McKathlin</a></p>
     </footer>
+    <div id="new-project-dialog" class="hidden dialog-container">
+        <form id="new-project-form" class="dialog">
+            <h2 class="dialog-head">Create Project</h2>
+            <label for="project-name">Project name:</label>
+            <input
+                id="new-project-name"
+                name="new-project-name"
+                title="Please enter a project name."
+                type="text"
+                required>
+            <label for="new-project-description">Description:</label>
+            <textarea
+                id="new-project-description"
+                name="new-project-description">
+            </textarea>
+            <div class="button-row">
+                <button type="submit" id="new-project-submit">Create</button>
+                <button type="button" id="new-project-cancel">Cancel</button>
+            </div>
+        </form>
+    </div>
+    <div id="new-task-dialog" class="hidden dialog-container">
+        <form id="new-task-form" class="dialog">
+            <h2 class="dialog-head">Create Task</h2>
+            <label for="new-task-title">Title:</label>
+            <input id="new-task-title"
+                name="new-task-title"
+                type="text"
+                required>
+            <label for="new-task-description">Description:</label>
+            <textarea id="new-task-description" name="new-task-description"></textarea>
+            <label for="new-task-priority">Priority:</label>
+            <select id="new-task-priority" name="new-task-priority">
+                <option value="1">Most Important</option>
+                <option value="2">Important</option>
+                <option value="3" selected>Default</option>
+                <option value="4">Not Important</option>
+            </select>
+            <label for="new-task-due-date">Due Date:</label>
+            <input id="new-task-due-date"
+                name="new-task-due-date"
+                type="date">
+            <div class="button-row">
+                <button id="new-task-submit" type="submit">Add Task</button>
+                <button id="new-task-cancel" type="button">Cancel</button>
+            </div>
+        </form>
+    </div>
 </body>
 </html>

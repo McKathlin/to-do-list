@@ -31,6 +31,7 @@ body {
 
     --header-height: 7rem;
     --footer-height: 1.5rem;
+    --max-reading-width: 40rem;
 
     font-family: var(--default-font);
     color: var(--text-color);
@@ -80,6 +81,11 @@ h1, h2, h3 {
 main {
     padding: 0.5rem 1rem;
     min-height: calc(100vh - var(--header-height) - var(--footer-height));
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
 }
 
 /* Title Heading */
@@ -162,15 +168,15 @@ header .disclaimer {
     top: -0.2rem;
 }
 
-/* Project Info Region */
+/* Project Info Section */
 
-/* To-Do List */
+/* Task List Section */
 
-#task-list-region {
+#task-list-section {
     padding: 0.5rem;
 }
 
-#task-list-region h3 {
+#task-list-section h3 {
     text-align: center;
     margin-bottom: 0.5rem;
 }
@@ -179,8 +185,7 @@ header .disclaimer {
     background-color: var(--container-back-color);
     box-shadow: var(--container-shadow);
 
-    max-width: 40rem;
-    margin: auto;
+    width: min(var(--max-reading-width), 98vw);
     padding: 0.5rem;
     border-radius: 0.4rem;
 
@@ -207,7 +212,11 @@ header .disclaimer {
     grid-template-columns: 1fr 4rem;
 }
 
-/* Completed Tasks */
+#new-task-show-button {
+    margin: 0.5rem auto;
+}
+
+/* Completed Tasks Section */
 
 /* Footer */
 
