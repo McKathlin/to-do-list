@@ -185,7 +185,7 @@ header .disclaimer {
     background-color: var(--container-back-color);
     box-shadow: var(--container-shadow);
 
-    width: min(var(--max-reading-width), 98vw);
+    width: min(var(--max-reading-width), 90vw);
     padding: 0.5rem;
     border-radius: 0.4rem;
 
@@ -209,7 +209,7 @@ header .disclaimer {
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 4rem;
+    grid-template-columns: 1fr 5rem;
 }
 
 #new-task-show-button {
