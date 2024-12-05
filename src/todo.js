@@ -215,8 +215,8 @@ const todo = (function() {
 
     const Workspace = (function() {
         let _defaultProject = new Project("Default Project", "");
-        let _projects = [];
-        let _currentProjectIndex = null;
+        let _projects = [_defaultProject];
+        let _currentProjectIndex = 0;
 
         const getProjects = function() {
             return _projects.slice();
