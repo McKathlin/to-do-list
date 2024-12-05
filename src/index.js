@@ -91,8 +91,10 @@ const MainPageController = (function() {
         });
 
         const toDoNode = doc.make(".task", [
-            doc.h3(task.title),
-            doc.p(task.description),
+            doc.make(".task-summary", [
+                doc.h4(task.title),
+                doc.p(task.description),
+            ]),
             buttonComplete,
         ]);
         return toDoNode;

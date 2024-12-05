@@ -9,6 +9,8 @@
 body {
     --text-color: #222222;
     --back-color: #eeeeee;
+    --header-back-color: #194381;
+    --header-text-color: #ffffff;
 
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color: var(--text-color);
@@ -27,6 +29,12 @@ body {
 }
 
 /* Title Heading */
+
+header {
+    color: var(--header-text-color);
+    background-color: var(--header-back-color);
+    text-align: center;
+}
 
 /* Project List Nav */
 
@@ -47,6 +55,43 @@ body {
 /* Project Info Region */
 
 /* To-Do List */
+
+#task-list-region {
+    padding: 0.5rem;
+}
+
+#task-list-region h3 {
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+#task-list-container {
+    color: var(--header-text-color);
+    background-color: var(--header-back-color);
+    max-width: 40rem;
+    margin: auto;
+    padding: 0.5rem;
+    border-radius: 0.4rem;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 0.2rem;
+}
+
+#task-list-container .task {
+    color: var(--text-color);
+    background-color: var(--back-color);
+    border: 0.1rem solid var(--text-color);
+    border-radius: 0.3rem;
+    padding: 0.2rem;
+    padding-left: 1ch;
+    width: 100%;
+
+    display: grid;
+    grid-template-columns: 1fr 4rem;
+}
 
 /* Completed Tasks */
 
