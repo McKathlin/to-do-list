@@ -12,9 +12,13 @@ body {
     --header-back-color: #194381;
     --header-text-color: #ffffff;
 
+    --header-height: 6.5rem;
+    --footer-height: 1.5rem;
+
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     color: var(--text-color);
     background-color: var(--back-color);
+    min-height: 100vh;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -28,15 +32,34 @@ body {
     display: none;
 }
 
+main {
+    padding: 1rem;
+    min-height: calc(100vh - var(--header-height) - var(--footer-height));
+}
+
 /* Title Heading */
 
 header {
+    height: var(--header-height);
+
     color: var(--header-text-color);
     background-color: var(--header-back-color);
     text-align: center;
+
+    display: flex;
+    flex-direction: column;
+}
+
+header h1 {
+    margin-top: 1rem;
+    flex: 1;
 }
 
 /* Project List Nav */
+
+header nav {
+    flex-grow: 0;
+}
 
 #project-select {
     display: flex;
@@ -96,3 +119,8 @@ header {
 /* Completed Tasks */
 
 /* Footer */
+
+footer {
+    text-align: center;
+    line-height: var(--footer-height);
+}
