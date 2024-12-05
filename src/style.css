@@ -15,6 +15,7 @@ body {
     --back-color: #eeeeee;
     --header-back-color: #194381;
     --header-text-color: #ffffff;
+    --create-color: #60dfb4;
 
     --container-back-color: #dddddd;
     --shadow-color: #00082820;
@@ -69,14 +70,15 @@ header {
 }
 
 header h1 {
-    margin-top: 1rem;
+    margin-top: 0.8rem;
+}
+
+header .disclaimer {
+    font-size: 0.9rem;
+    opacity: 0.8;
 }
 
 /* Project List Nav */
-
-header nav {
-    flex-grow: 0;
-}
 
 #project-select {
     display: flex;
@@ -89,6 +91,7 @@ header nav {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
+    align-items: bottom;
     gap: 1rem;
 }
 
@@ -97,6 +100,20 @@ header nav {
     min-width: 8ch;
     border: none;
     border-radius: 0.5rem 0.5rem 0 0;
+}
+
+#new-project-button {
+    background-color: var(--create-color);
+    font-size: 1rem;
+    font-weight: bold;
+    line-height: 1.5rem;
+    width: 1.5rem;
+    padding: 0;
+    border: none;
+    border-radius: 0.5lh;
+
+    position: relative;
+    top: -3px;
 }
 
 /* Project Info Region */
