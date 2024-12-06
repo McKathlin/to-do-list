@@ -11,8 +11,6 @@ const todo = (function() {
     let _nextProjectId = 1;
     let _nextTaskId = 100;
 
-    // !!! implement load/save
-
     //=========================================================================
     // Storage (private)
     //=========================================================================
@@ -50,18 +48,36 @@ const todo = (function() {
     // Task
     //=========================================================================
     const Task = class {
-        // Init
-        constructor(properties) {
-            if (typeof properties == "string") {
-                let title = properties;
-                properties = { title };
+
+        // Init / Unpack / Pack
+
+        constructor() {
+            this.unpack(...arguments);
+        }
+
+        unpack(data) {
+            if (typeof data == "string") {
+                let title = data;
+                data = { title };
             }
-            this._id = _nextTaskId++;
-            this.title = properties.title;
-            this.description = properties.description ?? "";
-            this.dueDate = properties.dueDate ?? null;
-            this.completionDate = properties.completionDate ?? null;
-            this.priority = properties.priority ?? Priority.SEMI_IMPORTANT;
+            this._id = data.id ?? _nextTaskId++;
+            this.title = data.title;
+            this.description = data.description ?? "";
+            this.dueDate = data.dueDate ?? null;
+            this.completionDate = data.completionDate ?? null;
+            this.priority = data.priority ?? Priority.SEMI_IMPORTANT;
+        }
+
+        pack() {
+            let data = {
+                id: this.id,
+                title: this.title,
+                description: this.description,
+                dueDate: this.dueDate,
+                completionDate: this.completionDate,
+                priority: this.priority,
+            };
+            return data;
         }
 
         // Properties
@@ -144,12 +160,54 @@ const todo = (function() {
     //=========================================================================
 
     const Project = class {
-        // Init
-        constructor(name, description = "") {
+
+        // Init / Unpack / Pack
+
+        constructor() {
+            if (typeof arguments[0] == "string") {
+                this.initialize(...arguments);
+            } else {
+                this.unpack(...arguments);
+            }
+        }
+
+        initialize(name, description = "") {
             this._id = _nextProjectId++;
             this.name = name;
             this.description = description;
             this._list = [];
+        }
+
+        unpack(data) {
+            this._id = data.id ?? _nextProjectId++;
+            this.name = data.name;
+            this.description = data.description ?? "";
+            if (data.tasks) {
+                this._list = data.tasks.map(element => new Task(element));
+            } else {
+                this._list = [];
+            }
+        }
+
+        _unpackTasks(tasks) {
+            if (!tasks) {
+                return [];
+            }
+
+            taskList = [];
+            for (const taskData of tasks) {
+                taskList.push(new Task(taskData));
+            }
+        }
+
+        pack() {
+            data = {
+                id: this.id,
+                name: this.name,
+                description: this.description,
+                tasks: this._list.map(task => task.pack()),
+            };
+            return data;
         }
 
         // Properties
