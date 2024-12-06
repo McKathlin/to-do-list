@@ -35,7 +35,7 @@ const todo = (function() {
             // !!! Implement saving to local storage
             const key = _makeKey(storable.dataType, storable.id);
             _cachedData[key] = storable.pack();
-            _unpackers[storable.dataType] = storable.unpackFunction();
+            _unpackers[storable.dataType] = storable.unpack;
         };
 
         return {
@@ -83,8 +83,8 @@ const todo = (function() {
         }
     });
 
-    Task.prototype.unpackFunction = function(data) {
-        return function(data) { return new Task(data) };
+    Task.prototype.unpack = function(data) {
+        return new Task(data);
     };
 
     Task.prototype.pack = function() {
@@ -221,8 +221,8 @@ const todo = (function() {
         }
     });
 
-    Project.prototype.unpackFunction = function(data) {
-        return function(data) { return new Project(data); };
+    Project.prototype.unpack = function(data) {
+        return new Project(data);
     };
 
     Project.prototype.pack = function() {
