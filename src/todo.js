@@ -11,6 +11,30 @@ const todo = (function() {
     let _nextProjectId = 1;
     let _nextTaskId = 100;
 
+    // !!! implement load/save
+
+    //=========================================================================
+    // Storage (private)
+    //=========================================================================
+
+    const Storage = (function() {
+        const _cachedProjects = {};
+
+        const loadProjectById = function(projectId) {
+            // !!! Implement loading from local storage
+            return _cachedProjects[projectId];
+        };
+
+        const saveProject = function(project) {
+            // !!! Implement saving to local storage
+            _cachedProjects[project.id] = project;
+        };
+
+        return {
+            loadProjectById, saveProject
+        }
+    })();
+
     //=========================================================================
     // Priority
     //=========================================================================
@@ -96,7 +120,7 @@ const todo = (function() {
             this._title = str;
         }
     
-        // Methods
+        // Public Methods
 
         isComplete() {
             return this.completionDate != null;
@@ -209,39 +233,61 @@ const todo = (function() {
     };
 
     //=========================================================================
+    // ProjectPreview
+    // A low-detail view into a Project
+    //=========================================================================
+
+    const ProjectPreview = class {
+        constructor(id, name) {
+            this._id = id;
+            this._name = name;
+        }
+
+        get id() {
+            return this._id;
+        }
+
+        get name() {
+            return this._name;
+        }
+    };
+
+    //=========================================================================
     // Workspace
-    // This singleton persists a list of objects
+    // This singleton manages a list of projects
     //=========================================================================
 
     const Workspace = (function() {
-        let _projects = [];
-        let _currentProjectIndex = 0;
+        let _projectPreviews = [];
+        let _currentProject = null;
 
         const singleton = {};
 
         Object.defineProperties(singleton, {
-            projects: {
+            projectPreviews: {
                 get: function() {
-                    return _projects.slice();
+                    return _projectPreviews.slice();
                 }
             },
             currentProject: {
                 get: function() {
-                    if (_currentProjectIndex < _projects.length) {
-                        return _projects[_currentProjectIndex];
-                    } else {
-                        return null;
-                    }
+                    return _currentProject;
                 },
-                set: function(project) {
-                    console.log("Attempting to set project")
-                    console.log(project);
-                    let index = _projects.indexOf(project);
-                    if (index >= 0) {
-                        _currentProjectIndex = index;
+                set: function(proj) {
+                    if (proj instanceof Project) {
+                        _currentProject = proj;
                     } else {
-                        throw new Error("Can't set project not in list!");
+                        let preview = proj;
+                        this.currentProjectId = preview.id;
                     }
+                }
+            },
+            currentProjectId: {
+                get: function() {
+                    return _currentProject.id;
+                },
+                set: function(id) {
+                    _currentProject = Storage.loadProjectById(id);
                 }
             }
         });
@@ -249,21 +295,22 @@ const todo = (function() {
         singleton.addProject = function(name, description = "") {
             let project = new Project(name, description);
             project.addTask("Add to-do items");
-            _projects.push(project);
+            _projectPreviews.push(new ProjectPreview(project.id, project.name));
+            Storage.saveProject(project);
             return project;
         };
 
         singleton.removeProject = function(project) {
-            let removalIndex = _projects.indexOf(project);
+            let removalIndex = _projectPreviews.indexOf(project);
             if (removalIndex >= 0) {
-                _projects.splice(removalIndex, 1);
+                _projectPreviews.splice(removalIndex, 1);
                 return true;
             } else {
                 return false;
             }
         };
 
-        singleton.addProject("Default Project", "");
+        _currentProject = singleton.addProject("Default Project", "");
         return singleton;
     })();
 

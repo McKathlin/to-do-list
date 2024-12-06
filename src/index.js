@@ -31,8 +31,9 @@ const MainPageController = (function() {
         refresh();
     };
 
-    const setProject = function(project) {
-        todo.Workspace.currentProject = project;
+    const setProject = function(projectPreview) {
+        todo.Workspace.currentProject = projectPreview;
+        console.log(`Switched to ${todo.Workspace.currentProject.name}`);
         refresh();
     };
 
@@ -47,21 +48,21 @@ const MainPageController = (function() {
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
-        for (const project of todo.Workspace.projects) {
-            let projectNode = _makeProjectNode(project);
+        for (const preview of todo.Workspace.projectPreviews) {
+            let projectNode = _makeProjectNode(preview);
             projectListNode.appendChild(projectNode);
         }
     };
 
-    const _makeProjectNode = function(project) {
-        let button = doc.make("button.project", project.name);
-        if (project == todo.Workspace.currentProject) {
+    const _makeProjectNode = function(projectPreview) {
+        let button = doc.make("button.project", projectPreview.name);
+        if (projectPreview.id == todo.Workspace.currentProject.id) {
             button.classList.add("current");
         } else {
             button.classList.add("other");
         }
         button.addEventListener("click", function(event) {
-            setProject(project);
+            setProject(projectPreview);
         });
         return button;
     };
