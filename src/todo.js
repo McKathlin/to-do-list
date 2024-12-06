@@ -16,20 +16,30 @@ const todo = (function() {
     //=========================================================================
 
     const Storage = (function() {
-        const _cachedProjects = {};
+        const _cachedData = {};
+        const _unpackers = {};
 
-        const loadProjectById = function(projectId) {
-            // !!! Implement loading from local storage
-            return _cachedProjects[projectId];
+        const _makeKey = function(dataType, id) {
+            return `${dataType}_${id}`;
         };
 
-        const saveProject = function(project) {
+        const load = function(dataType, id) {
+            // !!! Implement loading from local storage
+            const key = _makeKey(dataType, id);
+            const data = _cachedData[key];
+            const unpack = _unpackers[dataType];
+            return unpack(data);
+        };
+
+        const save = function(storable) {
             // !!! Implement saving to local storage
-            _cachedProjects[project.id] = project;
+            const key = _makeKey(storable.dataType, storable.id);
+            _cachedData[key] = storable.pack();
+            _unpackers[storable.dataType] = storable.unpackFunction();
         };
 
         return {
-            loadProjectById, saveProject
+            load, save
         }
     })();
 
@@ -47,111 +57,123 @@ const todo = (function() {
     //=========================================================================
     // Task
     //=========================================================================
-    const Task = class {
 
-        // Init / Unpack / Pack
+    function Task(data) {
+        if (typeof data == "string") {
+            let title = data;
+            data = { title };
+        }
+        this._id = data.id ?? _nextTaskId++;
+        this.title = data.title;
+        this.description = data.description ?? "";
+        this.dueDate = data.dueDate ?? null;
+        this.completionDate = data.completionDate ?? null;
+        this.priority = data.priority ?? Priority.SEMI_IMPORTANT;
+    }
 
-        constructor() {
-            this.unpack(...arguments);
-        }
+    // Storable implementation
 
-        unpack(data) {
-            if (typeof data == "string") {
-                let title = data;
-                data = { title };
-            }
-            this._id = data.id ?? _nextTaskId++;
-            this.title = data.title;
-            this.description = data.description ?? "";
-            this.dueDate = data.dueDate ?? null;
-            this.completionDate = data.completionDate ?? null;
-            this.priority = data.priority ?? Priority.SEMI_IMPORTANT;
+    Object.defineProperties(Task.prototype, {
+        dataType: {
+            value: "Task",
+            writable: false
+        },
+        id: {
+            get: function() { return this._id; }
         }
+    });
 
-        pack() {
-            let data = {
-                id: this.id,
-                title: this.title,
-                description: this.description,
-                dueDate: this.dueDate,
-                completionDate: this.completionDate,
-                priority: this.priority,
-            };
-            return data;
-        }
+    Task.prototype.unpackFunction = function(data) {
+        return function(data) { return new Task(data) };
+    };
 
-        // Properties
+    Task.prototype.pack = function() {
+        let data = {
+            id: this.id,
+            title: this.title,
+            description: this.description,
+            dueDate: this.dueDate,
+            completionDate: this.completionDate,
+            priority: this.priority,
+        };
+        return data;
+    };
 
-        get id() {
-            return this._id;
-        }
+    // Properties
 
-        get completionDate() {
-            return this._completionDate;
-        }
-        set completionDate(d) {
-            if (null === d || undefined === d) {
-                this._completionDate = null;
-            } else {
-                this._completionDate = new Date(d);
-            }
-        }
-
-        get description() {
-            return this._description;
-        }
-        set description(str) {
-            this._description = str;
-        }
-
-        get dueDate() {
-            return this._dueDate;
-        }
-        set dueDate(d) {
-            if (null === d || undefined === d) {
-                this._dueDate = null;
-            } else {
-                this._dueDate = new Date(d);
-            }
-        }
-
-        get priority() {
-            return this._priority;
-        }
-        set priority(p) {
-            if (Object.values(Priority).includes(p)) {
-                this._priority = p;
-            } else {
-                throw new Error("Unrecognized priority:", p);
-            }
-        }
-
-        get title() {
-            return this._title;
-        }
-        set title(str) {
-            if (!str || 0 == str.length) {
-                throw new Error("Title cannot be blank");
-            }
-            this._title = str;
-        }
+    Object.defineProperties(Task.prototype, {
+        completionDate: {
+            get: function() { 
+                return this._completionDate;
+            },
+            set: function(d) {
+                if (null === d || undefined === d) {
+                    this._completionDate = null;
+                } else {
+                    this._completionDate = new Date(d);
+                }
+            },
+        },
+        description: {
+            get: function() {
+                return this._description;
+            },
+            set: function(str) {
+                this._description = str;
+            },
+        },
+        dueDate: {
+            get: function() {
+                return this._dueDate;
+            },
+            set: function(d) {
+                if (null === d || undefined === d) {
+                    this._dueDate = null;
+                } else {
+                    this._dueDate = new Date(d);
+                }
+            },
+        },
+        priority: {
+            get: function() {
+                return this._priority;
+            },
+            set: function(p) {
+                if (Object.values(Priority).includes(p)) {
+                    this._priority = p;
+                } else {
+                    throw new Error("Unrecognized priority:", p);
+                }
+            },
+        },
+        title: {
+            get: function() {
+                return this._title;
+            },
+            set: function(str) {
+                if (!str || 0 == str.length) {
+                    throw new Error("Title cannot be blank");
+                }
+                this._title = str;
+            },
+        },
+    });
     
-        // Public Methods
+    // Public Methods
 
-        isComplete() {
-            return this.completionDate != null;
+    Task.prototype.isComplete = function() {
+        return this.completionDate != null;
+    };
+
+    Task.prototype.markComplete = function(date = null) {
+        if (null === date) {
+            date = Date.now();
         }
+        this.completionDate = date;
+    };
     
-        markComplete(date = null) {
-            if (null === date) {
-                date = Date.now();
-            }
-            this.completionDate = date;
-        }
-        
-        unmarkComplete() {
-            this.completionDate = null;
-        }
+    Task.prototype.unmarkComplete = function() {
+        this.completionDate = null;
     };
 
     //=========================================================================
@@ -159,134 +181,146 @@ const todo = (function() {
     // Holds a list of related tasks
     //=========================================================================
 
-    const Project = class {
+    // Init
 
-        // Init / Unpack / Pack
-
-        constructor() {
-            if (typeof arguments[0] == "string") {
-                this.initialize(...arguments);
-            } else {
-                this.unpack(...arguments);
-            }
+    function Project() {
+        if (typeof arguments[0] == "string") {
+            this.initialize(...arguments);
+        } else {
+            this.initFromData(...arguments);
         }
+    }
 
-        initialize(name, description = "") {
-            this._id = _nextProjectId++;
-            this.name = name;
-            this.description = description;
+    Project.prototype.initialize = function(name, description = "") {
+        this._id = _nextProjectId++;
+        this.name = name;
+        this.description = description;
+        this._list = [];
+    };
+
+    Project.prototype.initFromData = function(data) {
+        this._id = data.id ?? _nextProjectId++;
+        this.name = data.name;
+        this.description = data.description ?? "";
+        if (data.tasks) {
+            this._list = data.tasks.map(element => new Task(element));
+        } else {
             this._list = [];
         }
+    }
 
-        unpack(data) {
-            this._id = data.id ?? _nextProjectId++;
-            this.name = data.name;
-            this.description = data.description ?? "";
-            if (data.tasks) {
-                this._list = data.tasks.map(element => new Task(element));
+    // Storable implementation
+
+    Object.defineProperties(Project.prototype, {
+        dataType: {
+            value: "Project",
+            writable: false
+        },
+        id: {
+            get: function() { return this._id; }
+        }
+    });
+
+    Project.prototype.unpackFunction = function(data) {
+        return function(data) { return new Project(data); };
+    };
+
+    Project.prototype.pack = function() {
+        let data = {
+            id: this.id,
+            name: this.name,
+            description: this.description,
+            tasks: this._list.map(task => task.pack()),
+        };
+        return data;
+    };
+
+    // Properties
+
+    Object.defineProperties(Project.prototype, {
+        name: {
+            get: function() {
+                return this._name;
+            },
+            set: function(str) {
+                if (!str || 0 == str.length) {
+                    throw new Error("Project name cannot be empty");
+                }
+                this._name = str;
+            },
+        },
+        description: {
+            get: function() {
+                return this._description;
+            },
+            set: function(str) {
+                this._description = str;
+            },
+        },
+        allTasks: {
+            get: function() {
+                return this._list.slice();
+            },
+        },
+        actionTasks: {
+            get: function() {
+                return this._list.filter(item => !item.isComplete());
+            },
+        },
+        completedTasks: {
+            get: function() {
+                return this._list.filter(item => item.isComplete());
+            },
+        },
+    });
+
+    // Methods
+
+    Project.prototype.addTask = function(properties) {
+        if (typeof properties == "string") {
+            let title = properties;
+            properties = { title };
+        }
+        let item = new Task(properties);
+        this._list.push(item);
+    };
+
+    Project.prototype.removeTask = function(criteria) {
+        if (criteria instanceof Task) {
+            let index = this._list.indexOf(criteria);
+            if (index >= 0) {
+                this._list.splice(index, 1);
+                return true;
             } else {
-                this._list = [];
+                return false;
             }
         }
-
-        _unpackTasks(tasks) {
-            if (!tasks) {
-                return [];
-            }
-
-            taskList = [];
-            for (const taskData of tasks) {
-                taskList.push(new Task(taskData));
-            }
+        
+        if (typeof criteria == "number") {
+            let id = criteria;
+            criteria = { id };
+        } else if (typeof criteria == "string") {
+            let title = criteria;
+            criteria = { title };
+        } else if (!criteria) {
+            // Can't remove a null or undefined value.
+            return false;
         }
 
-        pack() {
-            data = {
-                id: this.id,
-                name: this.name,
-                description: this.description,
-                tasks: this._list.map(task => task.pack()),
-            };
-            return data;
-        }
-
-        // Properties
-
-        get id() {
-            return this._id;
-        }
-
-        get name() {
-            return this._name;
-        }
-        set name(str) {
-            if (!str || 0 == str.length) {
-                throw new Error("Project name cannot be empty");
-            }
-            this._name = str;
-        }
-
-        get description() {
-            return this._description;
-        }
-        set description(str) {
-            this._description = str;
-        }
-
-        get allTasks() {
-            return this._list.slice();
-        }
-
-        get actionTasks() {
-            return this._list.filter(item => !item.isComplete());
-        }
-
-        get completedTasks() {
-            return this._list.filter(item => item.isComplete());
-        }
-
-        // Methods
-
-        addTask(properties) {
-            if (typeof properties == "string") {
-                let title = properties;
-                properties = { title };
-            }
-            let item = new Task(properties);
-            this._list.push(item);
-        }
-
-        removeTask(criteria) {
-            let NOT_FOUND = -1;
-            if (criteria instanceof Task) {
-                let index = this._list.indexOf(criteria);
-                if (index != NOT_FOUND) {
-                    this._list.splice(index, 1);
-                    return true;
-                } else {
+        let removalIndex = this._list.findIndex((element) => {
+            for (key in criteria) {
+                if (element[key] != criteria[key]) {
                     return false;
                 }
             }
-            
-            if (typeof criteria == "number") {
-                let id = criteria;
-                criteria = { id };
-            } else if (typeof criteria == "string") {
-                let title = criteria;
-                criteria = { title };
-            } else if (!criteria) {
-                // Can't remove a null or undefined value.
-                return false;
-            }
+            return true;
+        });
 
-            let removalIndex = this._list.findIndex((element) => {
-                for (key in criteria) {
-                    if (element[key] != criteria[key]) {
-                        return false;
-                    }
-                }
-                return true;
-            });
+        if (removalIndex >= 0) {
+            this._list.splice(removalIndex, 1);
+            return true;
+        } else {
+            return false;
         }
     };
 
@@ -295,20 +329,19 @@ const todo = (function() {
     // A low-detail view into a Project
     //=========================================================================
 
-    const ProjectPreview = class {
-        constructor(id, name) {
-            this._id = id;
-            this._name = name;
-        }
+    function ProjectPreview(id, name) {
+        this._id = id;
+        this._name = name;
+    }
 
-        get id() {
-            return this._id;
-        }
-
-        get name() {
-            return this._name;
-        }
-    };
+    Object.defineProperties(ProjectPreview.prototype, {
+        id: {
+            get: function() { return this._id; },
+        },
+        name: {
+            get: function() { return this._name; },
+        },
+    });
 
     //=========================================================================
     // Workspace
@@ -332,6 +365,7 @@ const todo = (function() {
                     return _currentProject;
                 },
                 set: function(proj) {
+                    Storage.save(_currentProject);
                     if (proj instanceof Project) {
                         _currentProject = proj;
                     } else {
@@ -345,7 +379,7 @@ const todo = (function() {
                     return _currentProject.id;
                 },
                 set: function(id) {
-                    _currentProject = Storage.loadProjectById(id);
+                    _currentProject = Storage.load("Project", id);
                 }
             }
         });
@@ -354,7 +388,7 @@ const todo = (function() {
             let project = new Project(name, description);
             project.addTask("Add to-do items");
             _projectPreviews.push(new ProjectPreview(project.id, project.name));
-            Storage.saveProject(project);
+            Storage.save(project);
             return project;
         };
 
