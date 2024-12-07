@@ -32,8 +32,8 @@ const MainPageController = (function() {
     };
 
     const setProject = function(projectPreview) {
-        todo.Workspace.currentProject = projectPreview;
-        console.log(`Switched to ${todo.Workspace.currentProject.name}`);
+        todo.currentProject = projectPreview;
+        console.log(`Switched to ${todo.currentProject.name}`);
         refresh();
     };
 
@@ -48,7 +48,7 @@ const MainPageController = (function() {
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
-        for (const preview of todo.Workspace.projectPreviews) {
+        for (const preview of todo.projectPreviews) {
             let projectNode = _makeProjectNode(preview);
             projectListNode.appendChild(projectNode);
         }
@@ -56,7 +56,7 @@ const MainPageController = (function() {
 
     const _makeProjectNode = function(projectPreview) {
         let button = doc.make("button.project", projectPreview.name);
-        if (projectPreview.id == todo.Workspace.currentProject.id) {
+        if (projectPreview.id == todo.currentProject.id) {
             button.classList.add("current");
         } else {
             button.classList.add("other");
@@ -68,14 +68,14 @@ const MainPageController = (function() {
     };
 
     const _renderCurrentProjectInfo = function() {
-        let project = todo.Workspace.currentProject;
+        let project = todo.currentProject;
         projectNameNode.innerText = project.name;
         projectDescriptionNode.innerText = project.description;
     };
 
     const _renderToDoList = function() {
         taskListContainerNode.replaceChildren();
-        for (const task of todo.Workspace.currentProject.actionTasks) {
+        for (const task of todo.currentProject.actionTasks) {
             taskListContainerNode.appendChild(_makeToDoNode(task));
         }
     };
@@ -98,7 +98,7 @@ const MainPageController = (function() {
 
     const _renderCompletedTasks = function(task) {
         completedListContainerNode.replaceChildren();
-        for (const task of todo.Workspace.currentProject.completedTasks) {
+        for (const task of todo.currentProject.completedTasks) {
             completedListContainerNode.appendChild(_makeCompletedNode(task));
         }
     };
@@ -168,7 +168,7 @@ const NewProjectFormController = (function() {
     };
 
     const addProject = function(name, description = "") {
-        let project = todo.Workspace.addProject(name, description);
+        let project = todo.addProject(name, description);
         MainPageController.setProject(project);
     };
 
@@ -189,7 +189,7 @@ const ProjectEditController = (function() {
     // !!! add project edit form
 
     const removeProject = function(project) {
-        if (todo.Workspace.removeProject(project)) {
+        if (todo.removeProject(project)) {
             MainPageController.refresh();
         }
     };
@@ -262,12 +262,12 @@ const NewTaskFormController = (function() {
         newTaskDialog.classList.add("hidden");
         newTaskTitleInput.value = "";
         newTaskDescriptionInput.value = "";
-        newTaskPriorityInput.value = todo.Priority.SEMI_IMPORTANT;
+        newTaskPriorityInput.value = todo.priority.SEMI_IMPORTANT;
         newTaskDueDateInput.value = null;
     };
 
     const addTask = function(properties) {
-        todo.Workspace.currentProject.addTask(properties);
+        todo.currentProject.addTask(properties);
         MainPageController.refresh();
     };
 

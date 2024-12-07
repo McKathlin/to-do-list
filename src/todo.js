@@ -46,7 +46,7 @@ const todo = (function() {
     // Storable implementation
 
     Object.defineProperties(Task.prototype, {
-        dataType: {
+        typeName: {
             value: "Task",
             writable: false
         },
@@ -70,6 +70,8 @@ const todo = (function() {
         };
         return data;
     };
+
+    storage.registerType(Task.prototype);
 
     // Properties
 
@@ -186,7 +188,7 @@ const todo = (function() {
     // Storable implementation
 
     Object.defineProperties(Project.prototype, {
-        dataType: {
+        typeName: {
             value: "Project",
             writable: false
         },
@@ -208,6 +210,8 @@ const todo = (function() {
         };
         return data;
     };
+
+    storage.registerType(Project.prototype);
 
     // Properties
 
@@ -299,88 +303,130 @@ const todo = (function() {
     };
 
     //=========================================================================
-    // ProjectPreview
-    // A low-detail view into a Project
+    // Workspace
+    // Manages a list of projects
     //=========================================================================
 
-    function ProjectPreview(id, name) {
-        this._id = id;
-        this._name = name;
-    }
+    const Workspace = function(data={}) {
+        if (data.projectPreviews) {
+            this._projectPreviews = data.projectPreviews.slice();
+        } else {
+            this._projectPreviews = [];
+        }
 
-    Object.defineProperties(ProjectPreview.prototype, {
+        this._currentProject = null;
+        if (0 == this._projectPreviews.length) {
+            this._currentProject = this.addDefaultProject();
+        } else if (data.currentProjectId) {
+            this.currentProjectId = data.currentProjectId;
+        } else {
+            this.currentProject = this._projectPreviews[0];
+        }
+    };
+
+    // Storable interface
+
+    Object.defineProperties(Workspace.prototype, {
         id: {
-            get: function() { return this._id; },
+            value: "only",
+            writable: false,
         },
-        name: {
-            get: function() { return this._name; },
+        priority: {
+            value: Priority,
+            writable: false,
+        },
+        typeName: {
+            value: "Workspace",
+            writable: false,
         },
     });
 
-    //=========================================================================
-    // Workspace
-    // This singleton manages a list of projects
-    //=========================================================================
+    Workspace.prototype.pack = function() {
+        data = {
+            projectPreviews: this.projectPreviews,
+            currentProjectId: this.currentProjectId,
+        }
+    };
 
-    const Workspace = (function() {
-        let _projectPreviews = [];
-        let _currentProject = null;
+    Workspace.prototype.unpack = function(data) {
+        return new Workspace(data);
+    };
 
-        const singleton = {};
+    storage.registerType(Workspace.prototype);
 
-        Object.defineProperties(singleton, {
-            projectPreviews: {
-                get: function() {
-                    return _projectPreviews.slice();
-                }
+    // Public properties
+
+    Object.defineProperties(Workspace.prototype, {
+        projectPreviews: {
+            get: function() {
+                return this._projectPreviews.slice();
+            }
+        },
+        currentProject: {
+            get: function() {
+                return this._currentProject;
             },
-            currentProject: {
-                get: function() {
-                    return _currentProject;
-                },
-                set: function(proj) {
-                    storage.save(_currentProject);
-                    if (proj instanceof Project) {
-                        _currentProject = proj;
-                    } else {
-                        let preview = proj;
-                        this.currentProjectId = preview.id;
-                    }
-                }
-            },
-            currentProjectId: {
-                get: function() {
-                    return _currentProject.id;
-                },
-                set: function(id) {
-                    _currentProject = storage.load("Project", id);
+            set: function(proj) {
+                storage.save(this._currentProject);
+                if (proj instanceof Project) {
+                    this._currentProject = proj;
+                } else {
+                    let preview = proj;
+                    this.currentProjectId = preview.id;
                 }
             }
-        });
+        },
+        currentProjectId: {
+            get: function() {
+                return this._currentProject.id;
+            },
+            set: function(id) {
+                if (id === null || id === undefined) {
+                    this._currentProject = null;
+                } else {
+                    this._currentProject = storage.load("Project", id);
+                }
+            },
+        },
+    });
 
-        singleton.addProject = function(name, description = "") {
-            let project = new Project(name, description);
-            project.addTask("Add to-do items");
-            _projectPreviews.push(new ProjectPreview(project.id, project.name));
-            storage.save(project);
-            return project;
-        };
+    Workspace.prototype.addProject = function(name, description = "") {
+        let project = new Project(name, description);
+        let projectPreview = { id: project.id, name: project.name };
+        this._projectPreviews.push(projectPreview);
+        storage.save(project);
+        return project;
+    };
 
-        singleton.removeProject = function(project) {
-            let removalIndex = _projectPreviews.indexOf(project);
-            if (removalIndex >= 0) {
-                _projectPreviews.splice(removalIndex, 1);
-                return true;
-            } else {
-                return false;
-            }
-        };
+    Workspace.prototype.addDefaultProject = function() {
+        let project = this.addProject("Default Project", "");
+        project.addTask("Add to-do items");
+        return project;
+    };
 
-        _currentProject = singleton.addProject("Default Project", "");
-        return singleton;
-    })();
+    Workspace.prototype.removeProject = function(project) {
+        let removalIndex = this._projectPreviews.indexOf(project);
+        if (removalIndex >= 0) {
+            this._projectPreviews.splice(removalIndex, 1);
+            return true;
+        } else {
+            return false;
+        }
+    };
 
-    return { Workspace, Project, Task, Priority };
+    Workspace.prototype.save = function() {
+        storage.save(this.currentProject);
+        storage.save(this);
+    };
+
+    // Module returns
+
+    const todoSpace = storage.load("Workspace", "only");
+    if (!todoSpace) {
+        todoSpace = new Workspace();
+    }
+
+    return todoSpace;
 })();
 
 export default todo;
