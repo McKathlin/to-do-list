@@ -17,10 +17,10 @@ const todo = (function() {
     //=========================================================================
 
     const Priority = Object.freeze({
-        MOST_IMPORTANT: 1,
-        IMPORTANT: 2,
-        SEMI_IMPORTANT: 3,
-        NOT_IMPORTANT: 4,
+        TOP: 1,
+        HIGH: 2,
+        MEDIUM: 3,
+        LOW: 4,
     });
 
     //=========================================================================
@@ -40,7 +40,7 @@ const todo = (function() {
         this.description = data.description ?? "";
         this.dueDate = data.dueDate ?? null;
         this.completionDate = data.completionDate ?? null;
-        this.priority = data.priority ?? Priority.SEMI_IMPORTANT;
+        this.priority = data.priority ?? Priority.MEDIUM;
     }
 
     // Storable implementation

@@ -262,7 +262,7 @@ const NewTaskFormController = (function() {
         newTaskDialog.classList.add("hidden");
         newTaskTitleInput.value = "";
         newTaskDescriptionInput.value = "";
-        newTaskPriorityInput.value = todo.priority.SEMI_IMPORTANT;
+        newTaskPriorityInput.value = todo.priority.MEDIUM;
         newTaskDueDateInput.value = null;
     };
 
