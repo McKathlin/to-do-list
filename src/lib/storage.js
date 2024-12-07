@@ -2,7 +2,6 @@ const storage = (function() {
     const _STORABLE_PROPERTIES = ["id", "typeName"];
     const _STORABLE_METHODS = ["pack", "unpack"];
 
-    const _cachedData = {};
     const _unpackers = {};
 
     // Public methods
@@ -19,7 +18,6 @@ const storage = (function() {
     };
 
     const isStorable = function(proto) {
-        console.log("Checking storability:", proto);
         for (const prop of _STORABLE_PROPERTIES) {
             if (prop in proto == false) {
                 return false;
@@ -35,17 +33,29 @@ const storage = (function() {
     };
 
     const load = function(typeName, id) {
-        // !!! Implement loading from local storage
-        const key = _makeKey(typeName, id);
-        const data = _cachedData[key];
+        const json = localStorage.getItem(_makeKey(typeName, id));
+        if (!json) {
+            return null; // Nothing to load.
+        }
+        const data = JSON.parse(json);
         const unpack = _unpackers[typeName];
         return unpack(data);
     };
 
     const save = function(storable) {
-        // !!! Implement saving to local storage
-        const key = _makeKey(storable.typeName, storable.id);
-        _cachedData[key] = storable.pack();
+        if (!storable) {
+            return false;
+        }
+
+        try {
+            const key = _makeKey(storable.typeName, storable.id);
+            localStorage.setItem(key, JSON.stringify(storable.pack()));
+            console.log("Saved", key);
+            return true;
+        } catch (err) {
+            console.error("Saving failed!", err);
+            return false;
+        }
     };
 
     // Private helpers

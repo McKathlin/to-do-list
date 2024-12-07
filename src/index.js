@@ -32,8 +32,8 @@ const MainPageController = (function() {
     };
 
     const setProject = function(projectPreview) {
-        todo.currentProject = projectPreview;
-        console.log(`Switched to ${todo.currentProject.name}`);
+        console.log(`Switching to ${projectPreview.name}`);
+        todo.setProject(projectPreview);
         refresh();
     };
 

@@ -317,10 +317,10 @@ const todo = (function() {
         this._currentProject = null;
         if (0 == this._projectPreviews.length) {
             this._currentProject = this.addDefaultProject();
-        } else if (data.currentProjectId) {
-            this.currentProjectId = data.currentProjectId;
+        } else if (data.currentProject) {
+            this.setProject(data.currentProjectId);
         } else {
-            this.currentProject = this._projectPreviews[0];
+            this.setProject(this._projectPreviews[0]);
         }
     };
 
@@ -342,10 +342,11 @@ const todo = (function() {
     });
 
     Workspace.prototype.pack = function() {
-        data = {
+        let data = {
             projectPreviews: this.projectPreviews,
             currentProjectId: this.currentProjectId,
         }
+        return data;
     };
 
     Workspace.prototype.unpack = function(data) {
@@ -366,25 +367,13 @@ const todo = (function() {
             get: function() {
                 return this._currentProject;
             },
-            set: function(proj) {
-                storage.save(this._currentProject);
-                if (proj instanceof Project) {
-                    this._currentProject = proj;
-                } else {
-                    let preview = proj;
-                    this.currentProjectId = preview.id;
-                }
-            }
         },
         currentProjectId: {
             get: function() {
-                return this._currentProject.id;
-            },
-            set: function(id) {
-                if (id === null || id === undefined) {
-                    this._currentProject = null;
+                if (this._currentProject) {
+                    return this._currentProject.id;
                 } else {
-                    this._currentProject = storage.load("Project", id);
+                    return null;
                 }
             },
         },
@@ -394,7 +383,7 @@ const todo = (function() {
         let project = new Project(name, description);
         let projectPreview = { id: project.id, name: project.name };
         this._projectPreviews.push(projectPreview);
-        storage.save(project);
+        this.save();
         return project;
     };
 
@@ -402,6 +391,19 @@ const todo = (function() {
         let project = this.addProject("Default Project", "");
         project.addTask("Add to-do items");
         return project;
+    };
+
+    Workspace.prototype.setProject = function(proj) {
+        this.save();
+        if (proj === null || proj === undefined) {
+            this._currentProject = null;
+        } else if (proj instanceof Project) {
+            this._currentProject = proj;
+        } else {
+            // Load the project using its ID
+            let id = proj.id ?? proj;
+            this._currentProject = storage.load("Project", id);
+        }
     };
 
     Workspace.prototype.removeProject = function(project) {
@@ -421,7 +423,7 @@ const todo = (function() {
 
     // Module returns
 
-    const todoSpace = storage.load("Workspace", "only");
+    let todoSpace = storage.load("Workspace", "only");
     if (!todoSpace) {
         todoSpace = new Workspace();
     }
