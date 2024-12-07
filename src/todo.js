@@ -3,6 +3,7 @@
 // by McKathlin
 // Defines to-do items, projects, and priorities
 //=============================================================================
+import storage from "./lib/storage.js";
 
 const todo = (function() {
     //=========================================================================
@@ -10,38 +11,6 @@ const todo = (function() {
     //=========================================================================
     let _nextProjectId = 1;
     let _nextTaskId = 100;
-
-    //=========================================================================
-    // Storage (private)
-    //=========================================================================
-
-    const Storage = (function() {
-        const _cachedData = {};
-        const _unpackers = {};
-
-        const _makeKey = function(dataType, id) {
-            return `${dataType}_${id}`;
-        };
-
-        const load = function(dataType, id) {
-            // !!! Implement loading from local storage
-            const key = _makeKey(dataType, id);
-            const data = _cachedData[key];
-            const unpack = _unpackers[dataType];
-            return unpack(data);
-        };
-
-        const save = function(storable) {
-            // !!! Implement saving to local storage
-            const key = _makeKey(storable.dataType, storable.id);
-            _cachedData[key] = storable.pack();
-            _unpackers[storable.dataType] = storable.unpack;
-        };
-
-        return {
-            load, save
-        }
-    })();
 
     //=========================================================================
     // Priority
@@ -63,7 +32,10 @@ const todo = (function() {
             let title = data;
             data = { title };
         }
-        this._id = data.id ?? _nextTaskId++;
+
+        this._id = data.id ?? _nextTaskId;
+        _nextTaskId = Math.max(_nextTaskId, this._id) + 1;
+
         this.title = data.title;
         this.description = data.description ?? "";
         this.dueDate = data.dueDate ?? null;
@@ -199,7 +171,9 @@ const todo = (function() {
     };
 
     Project.prototype.initFromData = function(data) {
-        this._id = data.id ?? _nextProjectId++;
+        this._id = data.id ?? _nextProjectId;
+        _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
+
         this.name = data.name;
         this.description = data.description ?? "";
         if (data.tasks) {
@@ -365,7 +339,7 @@ const todo = (function() {
                     return _currentProject;
                 },
                 set: function(proj) {
-                    Storage.save(_currentProject);
+                    storage.save(_currentProject);
                     if (proj instanceof Project) {
                         _currentProject = proj;
                     } else {
@@ -379,7 +353,7 @@ const todo = (function() {
                     return _currentProject.id;
                 },
                 set: function(id) {
-                    _currentProject = Storage.load("Project", id);
+                    _currentProject = storage.load("Project", id);
                 }
             }
         });
@@ -388,7 +362,7 @@ const todo = (function() {
             let project = new Project(name, description);
             project.addTask("Add to-do items");
             _projectPreviews.push(new ProjectPreview(project.id, project.name));
-            Storage.save(project);
+            storage.save(project);
             return project;
         };
 
