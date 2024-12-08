@@ -86,7 +86,9 @@ const MainPageController = (function() {
             markComplete(task);
         });
 
-        const toDoNode = doc.make(".task", [
+        const priority = task.priorityWord.toLowerCase();
+
+        const toDoNode = doc.make(`.task.${priority}-priority`, [
             doc.make(".task-summary", [
                 doc.h4(task.title),
                 doc.p(task.description),

@@ -24,6 +24,11 @@ body {
     --shadow-color: #00082820;
     --dimmer-color: #00001880;
 
+    --top-priority-color: #FF5858;
+    --high-priority-color: #FFA050;
+    --medium-priority-color: #FFFF48;
+    --low-priority-color: var(--back-color);
+
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
     --item-shadow: 2px 2px 1px var(--shadow-color);
 
@@ -53,6 +58,11 @@ body {
 
         --shadow-color: #00000040;
         --dimmer-color: #000000a0;
+
+        --top-priority-color: #901810;
+        --high-priority-color: #604018;
+        --medium-priority-color: #404820;
+        --low-priority-color: var(--back-color);
     }
 }
 
@@ -215,6 +225,26 @@ header .disclaimer {
 
     display: grid;
     grid-template-columns: 1fr 5rem;
+}
+
+#task-list-container .task.top-priority {
+    color: var(--strong-text-color);
+    background-color: var(--top-priority-color);
+}
+
+#task-list-container .task.high-priority {
+    color: var(--strong-text-color);
+    background-color: var(--high-priority-color);
+}
+
+#task-list-container .task.medium-priority {
+    color: var(--text-color);
+    background-color: var(--medium-priority-color);
+}
+
+#task-list-container .task.low-priority {
+    color: var(--text-color);
+    background-color: var(--low-priority-color);
 }
 
 #new-task-show-button {

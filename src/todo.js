@@ -23,6 +23,13 @@ const todo = (function() {
         LOW: 4,
     });
 
+    const PriorityWord = Object.freeze({
+        1: "Top",
+        2: "High",
+        3: "Medium",
+        4: "Low",
+    });
+
     //=========================================================================
     // Task
     //=========================================================================
@@ -118,6 +125,11 @@ const todo = (function() {
                 } else {
                     throw new Error("Unrecognized priority:", p);
                 }
+            },
+        },
+        priorityWord: {
+            get: function() {
+                return PriorityWord[this._priority];
             },
         },
         title: {
