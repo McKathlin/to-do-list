@@ -60,7 +60,6 @@ const dateDiffs = (function() {
         ticks += (timeSpan.minutes ?? 0) * TICKS_PER_MINUTE;
         ticks += (timeSpan.seconds ?? 0) * TICKS_PER_SECOND;
         ticks += (timeSpan.milliseconds ?? 0) * TICKS_PER_MILLISECOND;
-        console.log("ticks", ticks);
         return ticks;
     };
 
