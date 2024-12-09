@@ -87,12 +87,13 @@ const MainPageController = (function() {
         });
 
         const priority = task.priorityWord.toLowerCase();
+        const duePhrase = task.dueDate ?
+            task.dueDate.toDateString("YYYY-MM-DD") :
+            "No due date";
 
         const toDoNode = doc.make(`.task.${priority}-priority`, [
-            doc.make(".task-summary", [
-                doc.h4(task.title),
-                doc.p(task.description),
-            ]),
+            doc.div(task.title),
+            doc.div(duePhrase),
             buttonComplete,
         ]);
         return toDoNode;

@@ -224,7 +224,7 @@ header .disclaimer {
     width: 100%;
 
     display: grid;
-    grid-template-columns: 1fr 5rem;
+    grid-template-columns: auto 9.5rem 5rem;
 }
 
 #task-list-container .task.top-priority {
