@@ -218,29 +218,29 @@ const ProjectEditController = (function() {
 // New Task Form Controller
 //=============================================================================
 
-const NewTaskFormController = (function() {
+const TaskFormController = (function() {
 
     // Nodes
 
     const newTaskShowButton =
         document.getElementById("new-task-show-button");
 
-    const newTaskDialog =
-        document.getElementById("new-task-dialog");
-    const newTaskForm =
-        document.getElementById("new-task-form");
-    const newTaskTitleInput =
-        document.getElementById("new-task-title");
-    const newTaskDescriptionInput =
-        document.getElementById("new-task-description");
-    const newTaskPriorityInput =
-        document.getElementById("new-task-priority");
-    const newTaskDueDateInput =
-        document.getElementById("new-task-due-date");
-    const newTaskSubmitButton =
-        document.getElementById("new-task-submit");
-    const newTaskCancelButton =
-        document.getElementById("new-task-cancel");
+    const taskDialog =
+        document.getElementById("task-dialog");
+    const taskForm =
+        document.getElementById("task-form");
+    const taskTitleInput =
+        document.getElementById("task-title");
+    const taskDescriptionInput =
+        document.getElementById("task-description");
+    const taskPriorityInput =
+        document.getElementById("task-priority");
+    const taskDueDateInput =
+        document.getElementById("task-due-date");
+    const taskSubmitButton =
+        document.getElementById("task-submit");
+    const taskCancelButton =
+        document.getElementById("task-cancel");
     
     // Setup
 
@@ -248,38 +248,38 @@ const NewTaskFormController = (function() {
         showDialog();
     });
 
-    newTaskSubmitButton.addEventListener("click", function(event) {
-        if (newTaskForm.checkValidity() == false) {
+    taskSubmitButton.addEventListener("click", function(event) {
+        if (taskForm.checkValidity() == false) {
             return; // Do built-in validation and nothing else.
         }
         event.preventDefault();
         
         let properties = {
-            title: newTaskTitleInput.value,
-            description: newTaskDescriptionInput.value,
-            priority: Number.parseInt(newTaskPriorityInput.value),
-            dueDate: dateDiffs.inputToLocalEOD(newTaskDueDateInput.value),
+            title: taskTitleInput.value,
+            description: taskDescriptionInput.value,
+            priority: Number.parseInt(taskPriorityInput.value),
+            dueDate: dateDiffs.inputToLocalEOD(taskDueDateInput.value),
         };
         addTask(properties);
         hideDialog();
     });
 
-    newTaskCancelButton.addEventListener("click", function(event) {
+    taskCancelButton.addEventListener("click", function(event) {
         hideDialog();
     });
 
     // Public methods
 
     const showDialog = function() {
-        newTaskDialog.classList.remove("hidden");
+        taskDialog.classList.remove("hidden");
     };
 
     const hideDialog = function() {
-        newTaskDialog.classList.add("hidden");
-        newTaskTitleInput.value = "";
-        newTaskDescriptionInput.value = "";
-        newTaskPriorityInput.value = todo.priority.MEDIUM;
-        newTaskDueDateInput.value = null;
+        taskDialog.classList.add("hidden");
+        taskTitleInput.value = "";
+        taskDescriptionInput.value = "";
+        taskPriorityInput.value = todo.priority.MEDIUM;
+        taskDueDateInput.value = null;
     };
 
     const addTask = function(properties) {
