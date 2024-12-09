@@ -110,7 +110,6 @@ const MainPageController = (function() {
 
         toDoNode.addEventListener("click", function(event) {
             if (event.target != buttonComplete) {
-                console.log("Clicked task:", task.title);
                 TaskFormController.showDialog(task);
             }
         });
@@ -300,7 +299,6 @@ const TaskFormController = (function() {
             taskDescriptionInput.value = task.description;
             taskPriorityInput.value = task.priority;
             taskDueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
-            console.log(taskDueDateInput.value);
             taskSubmitButton.innerText = "Save";
             
         } else {
