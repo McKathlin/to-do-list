@@ -230,6 +230,13 @@ const todo = (function() {
         return data;
     };
 
+    Project.prototype.wipeSave = function() {
+        for (let task of this._list) {
+            task.wipeSave();
+        }
+        storage.wipe(this);
+    };
+
     storage.registerType(Project.prototype);
 
     // Properties
@@ -286,9 +293,10 @@ const todo = (function() {
     };
 
     Project.prototype.removeTask = function(criteria) {
-        let removalIndex = this._findRemovalIndex(criteria);
-        if (removalIndex >= 0) {
-            this._list.spliace(index, 1);
+        let index = this._findRemovalIndex(criteria);
+        if (index >= 0) {
+            storage.wipe(this._list[index]);
+            this._list.splice(index, 1);
             this.save();
             return true;
         } else {
@@ -375,6 +383,10 @@ const todo = (function() {
         return new Workspace(data);
     };
 
+    Workspace.prototype.wipeSave = function() {
+
+    };
+
     storage.registerType(Workspace.prototype);
 
     // Public properties
@@ -415,24 +427,53 @@ const todo = (function() {
         return project;
     };
 
-    Workspace.prototype.setProject = function(proj) {
-        if (proj === null || proj === undefined) {
-            this._currentProject = null;
-        } else if (proj instanceof Project) {
-            this._currentProject = proj;
-        } else {
-            // Load the project using its ID
-            let id = proj.id ?? proj;
-            this._currentProject = storage.load("Project", id);
+    Workspace.prototype.getProjectAt = function(index) {
+        return getProject(this._projectPreviews[index]);
+    };
+
+    Workspace.prototype.getProject = function(projHandle) {
+        // Check if already in its final form
+        if (projHandle === null || projHandle === undefined) {
+            return null;
+        } else if (projHandle instanceof Project) {
+            return projHandle;
         }
+
+        // Get the project ID
+        let id = 'id' in projHandle ? projHandle.id : projHandle;
+        
+        // Get the project based on the ID
+        if (id == this._currentProject.id) {
+            return this._currentProject;
+        } else {
+            let project = storage.load("Project", id);
+            return project;
+        }
+    };
+
+    Workspace.prototype.setProject = function(proj) {
+        this._currentProject = this.getProject(proj);
         this.save();
         return this._currentProject;
     };
 
-    Workspace.prototype.removeProject = function(project) {
-        let removalIndex = this._projectPreviews.indexOf(project);
-        if (removalIndex >= 0) {
-            this._projectPreviews.splice(removalIndex, 1);
+    Workspace.prototype.removeProject = function(projHandle) {
+        // Wipe project save
+        let project = this.getProject(projHandle);
+        if (project) {
+            if (project == this.currentProject) {
+                this.currentProject = null;
+            }
+            project.wipeSave();
+        }
+
+        // Remove project preview from list
+        let id = 'id' in projHandle ? projHandle.id : projHandle;
+        let index = this._projectPreviews.find(
+            preview => preview.id == id
+        );
+        if (index >= 0) {
+            this._projectPreviews.splice(index, 1);
             return true;
         } else {
             return false;

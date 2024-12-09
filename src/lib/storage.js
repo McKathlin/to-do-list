@@ -14,11 +14,20 @@ const storage = (function() {
                 "\nMethods" + _STORABLE_METHODS.join(", ");
             throw new Error(usageMessage);
         }
-        proto.save = function() {
-            if (this._id !== undefined) {
-                storage.save(this);
+        if (!proto.save) {
+            proto.save = function() {
+                if (this._id !== undefined) {
+                    storage.save(this);
+                }
+            };
+        }
+        if (!proto.wipeSave) {
+            proto.wipeSave = function() {
+                if (!this._id !== undefined) {
+                    storage.wipe(this);
+                }
             }
-        };
+        }
         _unpackers[proto.typeName] = proto.unpack;
     };
 
