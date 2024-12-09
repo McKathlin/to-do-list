@@ -96,6 +96,13 @@ const dateDiffs = (function() {
 
     // Date input conversions
 
+    const toInputDateString = function(aDate) {
+        if (!aDate) {
+            return null;
+        }
+        return aDate.toISOString().split("T")[0];
+    };
+
     const inputToUTC = function(dateInputStr) {
         if (!dateInputStr) {
             return null;
@@ -136,7 +143,7 @@ const dateDiffs = (function() {
     let myModule = {
         addOffset, stripTime,
         dayDiff, daysFromToday, daysFromTodayString, today,
-        inputToUTC, inputToLocal, inputToLocalEOD,
+        toInputDateString, inputToUTC, inputToLocal, inputToLocalEOD,
     };
 
     Object.defineProperties(myModule, {

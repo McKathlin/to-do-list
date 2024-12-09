@@ -102,12 +102,18 @@ const MainPageController = (function() {
         const duePhrase = task.dueDate ?
             "Due " + dateDiffs.daysFromTodayString(task.dueDate) :
             "No due date";
-
         const toDoNode = doc.make(`.task.${priority}-priority`, [
             doc.div(task.title),
             doc.div(duePhrase),
             buttonComplete,
         ]);
+
+        toDoNode.addEventListener("click", function(event) {
+            if (event.target != buttonComplete) {
+                console.log("Clicked task:", task.title);
+                TaskFormController.showDialog(task);
+            }
+        });
         return toDoNode;
     };
 
@@ -215,10 +221,14 @@ const ProjectEditController = (function() {
 })();
 
 //=============================================================================
-// New Task Form Controller
+// Task Form Controller
 //=============================================================================
 
 const TaskFormController = (function() {
+
+    // Variables
+
+    let _currentTask = null;
 
     // Nodes
 
@@ -229,6 +239,8 @@ const TaskFormController = (function() {
         document.getElementById("task-dialog");
     const taskForm =
         document.getElementById("task-form");
+    const taskFormHeading =
+        document.getElementById("task-form-heading");
     const taskTitleInput =
         document.getElementById("task-title");
     const taskDescriptionInput =
@@ -254,13 +266,19 @@ const TaskFormController = (function() {
         }
         event.preventDefault();
         
+        // Gather properties
         let properties = {
             title: taskTitleInput.value,
             description: taskDescriptionInput.value,
             priority: Number.parseInt(taskPriorityInput.value),
             dueDate: dateDiffs.inputToLocalEOD(taskDueDateInput.value),
         };
-        addTask(properties);
+
+        if (_currentTask) {
+            editTask(_currentTask, properties);
+        } else {
+            addTask(properties);
+        }
         hideDialog();
     });
 
@@ -270,20 +288,50 @@ const TaskFormController = (function() {
 
     // Public methods
 
-    const showDialog = function() {
+    const showDialog = function(task = null) {
         taskDialog.classList.remove("hidden");
+        if (task) {
+            // Edit Task
+            _currentTask = task;
+            taskForm.classList.remove("create");
+            taskForm.classList.add("edit");
+            taskFormHeading.innerText = "Edit Task";
+            taskTitleInput.value = task.title;
+            taskDescriptionInput.value = task.description;
+            taskPriorityInput.value = task.priority;
+            taskDueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
+            console.log(taskDueDateInput.value);
+            taskSubmitButton.innerText = "Save";
+            
+        } else {
+            // Create Task
+            _currentTask = null;
+            taskForm.classList.remove("edit");
+            taskForm.classList.add("create");
+            taskFormHeading.innerText = "Create Task";
+            taskTitleInput.value = "";
+            taskDescriptionInput.value = "";
+            taskPriorityInput.value = todo.priority.MEDIUM;
+            taskDueDateInput.value = null;
+            taskSubmitButton.innerText = "Create";
+        }
     };
 
     const hideDialog = function() {
+        _currentTask = null;
         taskDialog.classList.add("hidden");
-        taskTitleInput.value = "";
-        taskDescriptionInput.value = "";
-        taskPriorityInput.value = todo.priority.MEDIUM;
-        taskDueDateInput.value = null;
     };
 
     const addTask = function(properties) {
         todo.currentProject.addTask(properties);
+        MainPageController.refresh();
+    };
+
+    const editTask = function(task, properties) {
+        task.title = properties.title;
+        task.description = properties.description;
+        task.priority = properties.priority;
+        task.dueDate = properties.dueDate;
         MainPageController.refresh();
     };
 

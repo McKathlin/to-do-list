@@ -67,7 +67,8 @@
     </div>
     <div id="task-dialog" class="hidden dialog-container">
         <form id="task-form" class="dialog">
-            <h2 class="dialog-head">Create Task</h2>
+            <h2 id="task-form-heading" class="dialog-head">Task</h2>
+            <input type="hidden" id="task-id">
             <label for="task-title">Title:</label>
             <input id="task-title"
                 name="task-title"
@@ -87,7 +88,7 @@
                 name="task-due-date"
                 type="date">
             <div class="button-row">
-                <button id="task-submit" type="submit">Add Task</button>
+                <button id="task-submit" type="submit">Submit</button>
                 <button id="task-cancel" type="button">Cancel</button>
             </div>
         </form>
