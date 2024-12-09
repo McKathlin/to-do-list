@@ -186,7 +186,7 @@ const todo = (function() {
     Project.prototype.initialize = function(name, description = "") {
         this.name = name;
         this.description = description;
-        this._list = [];
+        this._tasks = [];
         this._id = _nextProjectId++;
         this.save();
     };
@@ -194,10 +194,10 @@ const todo = (function() {
     Project.prototype.initFromData = function(data) {
         this.name = data.name;
         this.description = data.description ?? "";
-        if (data.tasks) {
-            this._list = data.tasks.map(element => new Task(element));
+        if (data.taskIds) {
+            this._tasks = data.taskIds.map(id => storage.load("Task", id));
         } else {
-            this._list = [];
+            this._tasks = [];
         }
         this._id = data.id ?? _nextProjectId;
         _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
@@ -225,13 +225,13 @@ const todo = (function() {
             id: this.id,
             name: this.name,
             description: this.description,
-            tasks: this._list.map(task => task.pack()),
+            taskIds: this._tasks.map(task => task.id),
         };
         return data;
     };
 
     Project.prototype.wipeSave = function() {
-        for (let task of this._list) {
+        for (let task of this._tasks) {
             task.wipeSave();
         }
         storage.wipe(this);
@@ -265,17 +265,17 @@ const todo = (function() {
         },
         allTasks: {
             get: function() {
-                return this._list.slice();
+                return this._tasks.slice();
             },
         },
         actionTasks: {
             get: function() {
-                return this._list.filter(item => !item.isComplete());
+                return this._tasks.filter(item => !item.isComplete());
             },
         },
         completedTasks: {
             get: function() {
-                return this._list.filter(item => item.isComplete());
+                return this._tasks.filter(item => item.isComplete());
             },
         },
     });
@@ -288,15 +288,15 @@ const todo = (function() {
             properties = { title };
         }
         let item = new Task(properties);
-        this._list.push(item);
+        this._tasks.push(item);
         this.save();
     };
 
     Project.prototype.removeTask = function(criteria) {
         let index = this._findRemovalIndex(criteria);
         if (index >= 0) {
-            storage.wipe(this._list[index]);
-            this._list.splice(index, 1);
+            storage.wipe(this._tasks[index]);
+            this._tasks.splice(index, 1);
             this.save();
             return true;
         } else {
@@ -307,7 +307,7 @@ const todo = (function() {
     Project.prototype._findRemovalIndex = function(criteria) {
         const NOT_FOUND = -1;
         if (criteria instanceof Task) {
-            return this._list.indexOf(criteria);
+            return this._tasks.indexOf(criteria);
         }
         
         if (typeof criteria == "number") {
@@ -321,7 +321,7 @@ const todo = (function() {
             return NOT_FOUND;
         }
 
-        let removalIndex = this._list.findIndex((element) => {
+        let removalIndex = this._tasks.findIndex((element) => {
             for (key in criteria) {
                 if (element[key] != criteria[key]) {
                     return false;
