@@ -40,14 +40,15 @@ const todo = (function() {
             data = { title };
         }
 
-        this._id = data.id ?? _nextTaskId;
-        _nextTaskId = Math.max(_nextTaskId, this._id) + 1;
-
         this.title = data.title;
         this.description = data.description ?? "";
         this.dueDate = data.dueDate ?? null;
         this.completionDate = data.completionDate ?? null;
         this.priority = data.priority ?? Priority.MEDIUM;
+
+        this._id = data.id ?? _nextTaskId;
+        _nextTaskId = Math.max(_nextTaskId, this._id) + 1;
+        this.save();
     }
 
     // Storable implementation
@@ -93,6 +94,7 @@ const todo = (function() {
                 } else {
                     this._completionDate = new Date(d);
                 }
+                this.save();
             },
         },
         description: {
@@ -101,6 +103,7 @@ const todo = (function() {
             },
             set: function(str) {
                 this._description = str;
+                this.save();
             },
         },
         dueDate: {
@@ -113,6 +116,7 @@ const todo = (function() {
                 } else {
                     this._dueDate = new Date(d);
                 }
+                this.save();
             },
         },
         priority: {
@@ -120,10 +124,11 @@ const todo = (function() {
                 return this._priority;
             },
             set: function(p) {
-                if (Object.values(Priority).includes(p)) {
-                    this._priority = p;
-                } else {
+                if (!Object.values(Priority).includes(p)) {
                     throw new Error("Unrecognized priority:", p);
+                } else {
+                    this._priority = p;
+                    this.save();
                 }
             },
         },
@@ -141,6 +146,7 @@ const todo = (function() {
                     throw new Error("Title cannot be blank");
                 }
                 this._title = str;
+                this.save();
             },
         },
     });
@@ -178,16 +184,14 @@ const todo = (function() {
     }
 
     Project.prototype.initialize = function(name, description = "") {
-        this._id = _nextProjectId++;
         this.name = name;
         this.description = description;
         this._list = [];
+        this._id = _nextProjectId++;
+        this.save();
     };
 
     Project.prototype.initFromData = function(data) {
-        this._id = data.id ?? _nextProjectId;
-        _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
-
         this.name = data.name;
         this.description = data.description ?? "";
         if (data.tasks) {
@@ -195,7 +199,10 @@ const todo = (function() {
         } else {
             this._list = [];
         }
-    }
+        this._id = data.id ?? _nextProjectId;
+        _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
+        this.save();
+    };
 
     // Storable implementation
 
@@ -237,6 +244,7 @@ const todo = (function() {
                     throw new Error("Project name cannot be empty");
                 }
                 this._name = str;
+                this.save();
             },
         },
         description: {
@@ -245,6 +253,7 @@ const todo = (function() {
             },
             set: function(str) {
                 this._description = str;
+                this.save();
             },
         },
         allTasks: {
@@ -273,17 +282,24 @@ const todo = (function() {
         }
         let item = new Task(properties);
         this._list.push(item);
+        this.save();
     };
 
     Project.prototype.removeTask = function(criteria) {
+        let removalIndex = this._findRemovalIndex(criteria);
+        if (removalIndex >= 0) {
+            this._list.spliace(index, 1);
+            this.save();
+            return true;
+        } else {
+            return false;
+        }
+    };
+
+    Project.prototype._findRemovalIndex = function(criteria) {
+        const NOT_FOUND = -1;
         if (criteria instanceof Task) {
-            let index = this._list.indexOf(criteria);
-            if (index >= 0) {
-                this._list.splice(index, 1);
-                return true;
-            } else {
-                return false;
-            }
+            return this._list.indexOf(criteria);
         }
         
         if (typeof criteria == "number") {
@@ -294,7 +310,7 @@ const todo = (function() {
             criteria = { title };
         } else if (!criteria) {
             // Can't remove a null or undefined value.
-            return false;
+            return NOT_FOUND;
         }
 
         let removalIndex = this._list.findIndex((element) => {
@@ -305,13 +321,7 @@ const todo = (function() {
             }
             return true;
         });
-
-        if (removalIndex >= 0) {
-            this._list.splice(removalIndex, 1);
-            return true;
-        } else {
-            return false;
-        }
+        return removalIndex;
     };
 
     //=========================================================================
@@ -406,7 +416,6 @@ const todo = (function() {
     };
 
     Workspace.prototype.setProject = function(proj) {
-        this.save();
         if (proj === null || proj === undefined) {
             this._currentProject = null;
         } else if (proj instanceof Project) {
@@ -416,6 +425,8 @@ const todo = (function() {
             let id = proj.id ?? proj;
             this._currentProject = storage.load("Project", id);
         }
+        this.save();
+        return this._currentProject;
     };
 
     Workspace.prototype.removeProject = function(project) {
@@ -426,11 +437,6 @@ const todo = (function() {
         } else {
             return false;
         }
-    };
-
-    Workspace.prototype.save = function() {
-        storage.save(this.currentProject);
-        storage.save(this);
     };
 
     // Module returns

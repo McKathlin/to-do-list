@@ -14,6 +14,11 @@ const storage = (function() {
                 "\nMethods" + _STORABLE_METHODS.join(", ");
             throw new Error(usageMessage);
         }
+        proto.save = function() {
+            if (this._id !== undefined) {
+                storage.save(this);
+            }
+        };
         _unpackers[proto.typeName] = proto.unpack;
     };
 
