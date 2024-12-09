@@ -24,9 +24,9 @@ body {
     --shadow-color: #00082820;
     --dimmer-color: #00001880;
 
-    --top-priority-color: #FF6058;
-    --high-priority-color: #FFA050;
-    --medium-priority-color: #FFFF48;
+    --top-priority-color: #ff8372;
+    --high-priority-color: #fcbb67;
+    --medium-priority-color: #f1f1a2;
     --low-priority-color: var(--back-color);
 
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
@@ -60,8 +60,8 @@ body {
         --dimmer-color: #000000a0;
 
         --top-priority-color: #901810;
-        --high-priority-color: #463a2b;
-        --medium-priority-color: #404820;
+        --high-priority-color: #754810;
+        --medium-priority-color: #40441e;
         --low-priority-color: var(--back-color);
     }
 }
