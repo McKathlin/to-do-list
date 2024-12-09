@@ -1,7 +1,9 @@
 
 
 const dateDiffs = (function() {
-    
+
+    // Constants
+
     const MILLISECONDS_PER_SECOND = 1000;
     const SECONDS_PER_MINUTE = 60;
     const MINUTES_PER_HOUR = 60;
@@ -12,6 +14,8 @@ const dateDiffs = (function() {
     const TICKS_PER_MINUTE = TICKS_PER_SECOND * SECONDS_PER_MINUTE;
     const TICKS_PER_HOUR = TICKS_PER_MINUTE * MINUTES_PER_HOUR;
     const TICKS_PER_DAY = TICKS_PER_HOUR * HOURS_PER_DAY;
+
+    // Variables and properties
 
     // _eodHours = hours from midnight to end of work day
     let _eodHours = 17; // 5:00pm
@@ -29,10 +33,53 @@ const dateDiffs = (function() {
         },
     };
 
+    // Date adjustment utilities
+
     const addOffset = function(aDate, offsetTimeSpan) {
         let offsetTicks = timeSpanToTicks(offsetTimeSpan);
         return new Date(aDate.getTime() + offsetTicks);
     };
+
+    const stripTime = function(aDateTime) {
+        // Strips the time off of a Date
+        // returning the moment that day began.
+        return new Date(aDateTime.toDateString());
+    };
+
+    // Day-only calculations
+
+    const dayDiff = function(endDate, startDate) {
+        return (stripTime(endDate) - stripTime(startDate)) / TICKS_PER_DAY;
+    };
+
+    const daysFromToday = function(aDate) {
+        const now = new Date();
+        return dayDiff(aDate, now);
+    };
+
+    const daysFromTodayString = function(aDate) {
+        const days = daysFromToday(aDate);
+        if (0 == days) {
+            return "today";
+        } else if (1 == days) {
+            return "tomorrow";
+        } else if (-1 == days) {
+            return "yesterday";
+        } else if (days < 0) {
+            // It's in the past
+            return `${-days} days ago`;
+        } else {
+            // It's in the future
+            return `in ${days} days`;
+        }
+    };
+
+    const today = function() {
+        let now = new Date();
+        return stripTime(now);
+    };
+
+    // Date input conversions
 
     const inputToUTC = function(dateInputStr) {
         return new Date(`${dateInputStr} UTC`);
@@ -63,9 +110,12 @@ const dateDiffs = (function() {
         return ticks;
     };
 
+    // Module build
+
     let myModule = {
+        addOffset, stripTime,
+        dayDiff, daysFromToday, daysFromTodayString, today,
         inputToUTC, inputToLocal, inputToLocalEOD,
-        addOffset
     };
 
     Object.defineProperties(myModule, {

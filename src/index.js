@@ -100,7 +100,7 @@ const MainPageController = (function() {
 
         const priority = task.priorityWord.toLowerCase();
         const duePhrase = task.dueDate ?
-            task.dueDate.toDateString() :
+            "Due " + dateDiffs.daysFromTodayString(task.dueDate) :
             "No due date";
 
         const toDoNode = doc.make(`.task.${priority}-priority`, [
