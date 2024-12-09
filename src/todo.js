@@ -443,7 +443,7 @@ const todo = (function() {
         let id = 'id' in projHandle ? projHandle.id : projHandle;
         
         // Get the project based on the ID
-        if (id == this._currentProject.id) {
+        if (this._currentProject && id == this._currentProject.id) {
             return this._currentProject;
         } else {
             let project = storage.load("Project", id);
