@@ -16,7 +16,7 @@ const storage = (function() {
         }
         if (!proto.save) {
             proto.save = function() {
-                if (this._id !== undefined) {
+                if (this.id !== undefined) {
                     storage.save(this);
                 }
             };
@@ -51,7 +51,7 @@ const storage = (function() {
         if (!json) {
             return null; // Nothing to load.
         }
-
+        
         try {
             const data = JSON.parse(json);
             const unpack = _unpackers[typeName];
@@ -65,7 +65,7 @@ const storage = (function() {
 
     const save = function(storable) {
         if (!storable) {
-            return false;
+            throw new Error("Can't save non-storable", storable);
         }
 
         try {
@@ -80,7 +80,7 @@ const storage = (function() {
 
     const wipe = function(storable) {
         if (!storable) {
-            return false;
+            throw new Error("Can't wipe non-storable", storable);
         }
 
         try {

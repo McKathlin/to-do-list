@@ -384,7 +384,11 @@ const todo = (function() {
     };
 
     Workspace.prototype.wipeSave = function() {
-
+        for (let preview of this._projectPreviews) {
+            let project = this.getProject(preview);
+            project.wipeSave();
+        }
+        storage.wipe(this);
     };
 
     storage.registerType(Workspace.prototype);
