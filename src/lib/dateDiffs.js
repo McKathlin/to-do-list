@@ -36,11 +36,17 @@ const dateDiffs = (function() {
     // Date adjustment utilities
 
     const addOffset = function(aDate, offsetTimeSpan) {
+        if (!aDate) {
+            return null;
+        }
         let offsetTicks = timeSpanToTicks(offsetTimeSpan);
         return new Date(aDate.getTime() + offsetTicks);
     };
 
     const stripTime = function(aDateTime) {
+        if (!aDateTime) {
+            return null;
+        }
         // Strips the time off of a Date
         // returning the moment that day began.
         return new Date(aDateTime.toDateString());
@@ -49,15 +55,24 @@ const dateDiffs = (function() {
     // Day-only calculations
 
     const dayDiff = function(endDate, startDate) {
+        if (!endDate || !startDate) {
+            return null;
+        }
         return (stripTime(endDate) - stripTime(startDate)) / TICKS_PER_DAY;
     };
 
     const daysFromToday = function(aDate) {
+        if (!aDate) {
+            return null;
+        }
         const now = new Date();
         return dayDiff(aDate, now);
     };
 
     const daysFromTodayString = function(aDate) {
+        if (!aDate) {
+            return null;
+        }
         const days = daysFromToday(aDate);
         if (0 == days) {
             return "today";
@@ -82,6 +97,9 @@ const dateDiffs = (function() {
     // Date input conversions
 
     const inputToUTC = function(dateInputStr) {
+        if (!dateInputStr) {
+            return null;
+        }
         return new Date(`${dateInputStr} UTC`);
     };
 
@@ -101,6 +119,9 @@ const dateDiffs = (function() {
     };
 
     const timeSpanToTicks = function(timeSpan) {
+        if (!timeSpan) {
+            return 0;
+        }
         let ticks = 0;
         ticks += (timeSpan.days ?? 0) * TICKS_PER_DAY;
         ticks += (timeSpan.hours ?? 0) * TICKS_PER_HOUR;
