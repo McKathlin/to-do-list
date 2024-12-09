@@ -42,9 +42,16 @@ const storage = (function() {
         if (!json) {
             return null; // Nothing to load.
         }
-        const data = JSON.parse(json);
-        const unpack = _unpackers[typeName];
-        return unpack(data);
+
+        try {
+            const data = JSON.parse(json);
+            const unpack = _unpackers[typeName];
+            return unpack(data);
+        } catch (err) {
+            console.error("Loading failed!", err);
+            return null;
+        }
+        
     };
 
     const save = function(storable) {
@@ -55,11 +62,23 @@ const storage = (function() {
         try {
             const key = _makeKey(storable.typeName, storable.id);
             localStorage.setItem(key, JSON.stringify(storable.pack()));
-            console.log("Saved", key);
             return true;
         } catch (err) {
             console.error("Saving failed!", err);
             return false;
+        }
+    };
+
+    const wipe = function(storable) {
+        if (!storable) {
+            return false;
+        }
+
+        try {
+            const key = _makeKey(storable.typeName, storable.id);
+            localStorage.removeItem(key);
+        } catch (err) {
+            console.error("Wiping failed!", err);
         }
     };
 
@@ -72,7 +91,7 @@ const storage = (function() {
     // Module returns
 
     return {
-        registerType, load, save
+        registerType, isStorable, load, save, wipe
     }
 })();
 
