@@ -1,6 +1,7 @@
 import "./style.css";
 
 import doc from "./lib/doc.js";
+import dateDiffs from "./lib/dateDiffs.js";
 import todo from "./todo.js";
 
 //=============================================================================
@@ -9,6 +10,8 @@ import todo from "./todo.js";
 
 const MainPageController = (function() {
     // Nodes
+
+    const currentTimeNode = document.getElementById("current-time");
 
     const projectListNode = document.getElementById("project-list");
 
@@ -38,6 +41,7 @@ const MainPageController = (function() {
     };
 
     const refresh = function() {
+        _renderCurrentTime();
         _renderProjects();
         _renderCurrentProjectInfo();
         _renderToDoList();
@@ -45,6 +49,14 @@ const MainPageController = (function() {
     };
 
     // Private helper methods
+
+    const _renderCurrentTime = function() {
+        if (!currentTimeNode) {
+            return;
+        }
+        let timeStr = new Date().toString();
+        currentTimeNode.innerText = timeStr;
+    };
 
     const _renderProjects = function() {
         projectListNode.replaceChildren();
@@ -88,7 +100,7 @@ const MainPageController = (function() {
 
         const priority = task.priorityWord.toLowerCase();
         const duePhrase = task.dueDate ?
-            task.dueDate.toDateString("YYYY-MM-DD") :
+            task.dueDate.toDateString() :
             "No due date";
 
         const toDoNode = doc.make(`.task.${priority}-priority`, [
@@ -241,11 +253,12 @@ const NewTaskFormController = (function() {
             return; // Do built-in validation and nothing else.
         }
         event.preventDefault();
+        
         let properties = {
             title: newTaskTitleInput.value,
             description: newTaskDescriptionInput.value,
             priority: Number.parseInt(newTaskPriorityInput.value),
-            dueDate: newTaskDueDateInput.value,
+            dueDate: dateDiffs.inputToLocalEOD(newTaskDueDateInput.value),
         };
         addTask(properties);
         hideDialog();
