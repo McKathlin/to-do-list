@@ -37,7 +37,7 @@ body {
     --default-font: Verdana, Geneva, Tahoma, sans-serif;
 
     --header-height: 7rem;
-    --footer-height: 1.5rem;
+    --footer-height: 2rem;
     --max-reading-width: min(40rem, 90vw);
 
     font-family: var(--default-font);
@@ -268,8 +268,14 @@ header .disclaimer {
 /* Footer */
 
 footer {
+    color: var(--header-text-color);
+    background-color: var(--header-back-color);
     text-align: center;
     line-height: var(--footer-height);
+}
+
+footer a {
+    color: var(--header-text-color);
 }
 
 /* Dropdown lists */
