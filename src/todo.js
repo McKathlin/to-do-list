@@ -271,12 +271,15 @@ const todo = (function() {
         },
         actionTasks: {
             get: function() {
-                return this._tasks.filter(item => !item.isComplete());
+                return this._tasks.filter(item => !item.isComplete())
+                    .sort((a, b) => a.priority - b.priority);
             },
         },
         completedTasks: {
             get: function() {
-                return this._tasks.filter(item => item.isComplete());
+                // All completed tasks, most recently completed first
+                return this._tasks.filter(item => item.isComplete())
+                    .sort((a, b) => b.completionDate - a.completionDate);
             },
         },
     });
