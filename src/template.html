@@ -85,8 +85,13 @@
                 type="date">
             <div id="task-button-row" class="button-row">
                 <button id="task-submit" type="submit">Submit</button>
-                <button id="task-start-delete" type="button" class="delete">Delete</button>
                 <button id="task-cancel" type="button" class="cancel">Cancel</button>
+                <div class="actions-dropdown dropdown-container">
+                    <button type="button" class="menu-button">...</button>
+                    <menu class="dropdown-menu">
+                        <button id="task-start-delete" type="button" class="delete">Delete</button>
+                    </menu>
+                </div>
             </div>
             <div id="delete-task-button-row" class="button-row hidden">
                 <button id="delete-task-confirm" type="button" class="delete">Confirm Delete</button>

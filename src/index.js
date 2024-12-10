@@ -253,11 +253,14 @@ const TaskFormController = (function() {
         document.getElementById("task-button-row");
     const submitButton =
         document.getElementById("task-submit");
-    const startDeleteButton =
-        document.getElementById("task-start-delete");
     const cancelButton =
         document.getElementById("task-cancel");
     
+    const actionsDropdown =
+        document.getElementById("task-actions-dropdown");
+    const startDeleteButton =
+        document.getElementById("task-start-delete");
+
     const deleteButtonRow =
         document.getElementById("delete-task-button-row");
     const confirmDeleteButton =

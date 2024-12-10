@@ -272,6 +272,24 @@ footer {
     line-height: var(--footer-height);
 }
 
+/* Dropdown lists */
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    background-color: var(--back-color);
+    border: 1px solid var(--edge-color);
+}
+
+.dropdown-container:hover .dropdown-menu {
+    display: block;
+}
+
+.dropdown-menu > * {
+    border: none;
+    border-radius: 0;
+}
+
 /* Dialogs */
 
 .dialog-container {
@@ -349,6 +367,10 @@ footer {
         background-color: var(--back-color);
     }
 
+    button.menu-button {
+        min-width: 2rem;
+    }
+
     button[type='submit'] {
         font-weight: bold;
         background-color: var(--create-color);
@@ -360,7 +382,7 @@ footer {
 }
 
 .dialog.create {
-    button.delete {
+    .actions-dropdown {
         display: none;
     }
 }
