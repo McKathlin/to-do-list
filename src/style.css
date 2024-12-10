@@ -126,8 +126,9 @@ header h1 {
     font-size: 3rem;
     font-weight: 400;
     font-style: normal;
+    transform: scale(1.2, 1);
     color: var(--header-text-color);
-    margin-top: 0.8rem;
+    margin: auto;
 }
 
 header .disclaimer {
@@ -196,9 +197,21 @@ header .disclaimer {
 
 /* Project Info Section */
 
-#project-info-section > * {
-    width: var(--max-reading-width);
-    margin: auto;
+#project-info-section {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: stretch;
+    align-items: flex-start;
+}
+
+.project-info-block {
+    flex: 1;
+    max-width: var(--max-reading-width);
+}
+
+.project-info-block h2 {
+    margin-bottom: 0.4rem;
 }
 
 /* To-Do Task List Section */

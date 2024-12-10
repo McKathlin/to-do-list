@@ -138,7 +138,7 @@ const MainPageController = (function() {
 })();
 
 //=============================================================================
-// New Project Form Controller
+// Project Form Controller
 //=============================================================================
 
 const NewProjectFormController = (function() {
@@ -146,13 +146,13 @@ const NewProjectFormController = (function() {
     const newProjectShowButton = document.getElementById(
         "new-project-button");
 
-    const newProjectDialog = document.getElementById("new-project-dialog");
-    const newProjectForm = document.getElementById("new-project-form");
-    const projectNameInput = document.getElementById("new-project-name");
+    const newProjectDialog = document.getElementById("project-dialog");
+    const newProjectForm = document.getElementById("project-form");
+    const projectNameInput = document.getElementById("project-name");
     const projectDescriptionInput = document.getElementById(
-        "new-project-description");
-    const newProjectSubmit = document.getElementById("new-project-submit");
-    const newProjectCancel = document.getElementById("new-project-cancel");
+        "project-description");
+    const newProjectSubmit = document.getElementById("project-submit");
+    const newProjectCancel = document.getElementById("project-cancel");
 
     // Setup
 
