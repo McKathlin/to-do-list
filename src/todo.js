@@ -3,8 +3,7 @@
 // by McKathlin
 // Defines to-do items, projects, and priorities
 //=============================================================================
-import storage from "./lib/storage.js";
-import Observable from "./lib/observable.js";
+import autosave from "./lib/autosave.js";
 
 const todo = (function() {
     //=========================================================================
@@ -35,69 +34,92 @@ const todo = (function() {
     // Task
     //=========================================================================
 
-    function Task(data) {
-        if (typeof data == "string") {
-            let title = data;
-            data = { title };
+    class Task extends autosave.AutosavingObservable {
+        constructor(data) {
+            super(data.id ?? _nextTaskId);
+
+            if (typeof data == "string") {
+                let title = data;
+                data = { title };
+            }
+
+            this._title = data.title;
+            this._description = data.description ?? "";
+            this._dueDate = this._parseNullableDate(data.dueDate);
+            this._completionDate = this._parseNullableDate(data.completionDate);
+            this._priority = data.priority ?? Priority.MEDIUM;
+
+            if (data.id === undefined) {
+                _nextTaskId++;
+                this.onCreate();
+            } else {
+                _nextTaskId = Math.max(_nextTaskId, this.id) + 1;
+            }
         }
 
-        this.title = data.title;
-        this.description = data.description ?? "";
-        this.dueDate = data.dueDate ?? null;
-        this.completionDate = data.completionDate ?? null;
-        this.priority = data.priority ?? Priority.MEDIUM;
+        // Storable implementation
 
-        this._id = data.id ?? _nextTaskId;
-        _nextTaskId = Math.max(_nextTaskId, this._id) + 1;
-        this.save();
-    }
-
-    Task.prototype = Object.create(Observable.prototype);
-
-    // Storable implementation
-
-    Object.defineProperties(Task.prototype, {
-        typeName: {
-            value: "Task",
-            writable: false
-        },
-        id: {
-            get: function() { return this._id; }
+        get typeName() {
+            return "Task";
         }
-    });
 
-    Task.prototype.unpack = function(data) {
-        return new Task(data);
+        unpack(data) {
+            return new Task(data);
+        }
+
+        pack() {
+            let data = {
+                id: this.id,
+                title: this.title,
+                description: this.description,
+                dueDate: this.dueDate,
+                completionDate: this.completionDate,
+                priority: this.priority,
+            };
+            return data;
+        }
+
+        // Public methods
+
+        isComplete() {
+            return this.completionDate != null;
+        }
+
+        markComplete(date = null) {
+            if (null === date) {
+                date = Date.now();
+            }
+            this.completionDate = date;
+        }
+
+        unmarkComplete() {
+            this.completionDate = null;
+        }
+
+        // Private helper methods
+
+        _parseNullableDate(d) {
+            if (null === d || undefined === d) {
+                return null;
+            } else {
+                return new Date(d);
+            }
+        }
     };
 
-    Task.prototype.pack = function() {
-        let data = {
-            id: this.id,
-            title: this.title,
-            description: this.description,
-            dueDate: this.dueDate,
-            completionDate: this.completionDate,
-            priority: this.priority,
-        };
-        return data;
-    };
-
-    storage.registerType(Task.prototype);
+    autosave.registerType(Task.prototype);
 
     // Properties
 
+    // !!! Put properties in class
     Object.defineProperties(Task.prototype, {
         completionDate: {
             get: function() { 
                 return this._completionDate;
             },
             set: function(d) {
-                if (null === d || undefined === d) {
-                    this._completionDate = null;
-                } else {
-                    this._completionDate = new Date(d);
-                }
-                this.save();
+                this._completionDate = this._parseNullableDate(d);
+                this.notifyChanged({ propertyName: "completionDate" });
             },
         },
         description: {
@@ -106,7 +128,7 @@ const todo = (function() {
             },
             set: function(str) {
                 this._description = str;
-                this.save();
+                this.notifyChanged({ propertyName: "description" });
             },
         },
         dueDate: {
@@ -114,12 +136,8 @@ const todo = (function() {
                 return this._dueDate;
             },
             set: function(d) {
-                if (null === d || undefined === d) {
-                    this._dueDate = null;
-                } else {
-                    this._dueDate = new Date(d);
-                }
-                this.save();
+                this._dueDate = this._parseNullableDate(d);
+                this.notifyChanged({ propertyName: "dueDate" });
             },
         },
         priority: {
@@ -131,7 +149,7 @@ const todo = (function() {
                     throw new Error("Unrecognized priority:", p);
                 } else {
                     this._priority = p;
-                    this.save();
+                    this.notifyChanged({ propertyName: "priority" });
                 }
             },
         },
@@ -149,28 +167,11 @@ const todo = (function() {
                     throw new Error("Title cannot be blank");
                 }
                 this._title = str;
-                this.save();
+                this.notifyChanged({ propertyName: "title" });
             },
         },
     });
     
-    // Public Methods
-
-    Task.prototype.isComplete = function() {
-        return this.completionDate != null;
-    };
-
-    Task.prototype.markComplete = function(date = null) {
-        if (null === date) {
-            date = Date.now();
-        }
-        this.completionDate = date;
-    };
-    
-    Task.prototype.unmarkComplete = function() {
-        this.completionDate = null;
-    };
-
     //=========================================================================
     // Project
     // Holds a list of related tasks
@@ -178,72 +179,131 @@ const todo = (function() {
 
     // Init
 
-    function Project() {
-        if (typeof arguments[0] == "string") {
-            this.initialize(...arguments);
-        } else {
-            this.initFromData(...arguments);
+    class Project extends autosave.AutosavingObservable {
+        constructor(data) {
+            super(data.id ?? _nextProjectId);
+
+            if (typeof data == "string") {
+                let name = data;
+                data = { name };
+            }
+
+            this._name = data.name;
+            this._description = data.description ?? "";
+            if (data.taskIds) {
+                this._tasks = data.taskIds.map(id => autosave.load("Task", id));
+                this._removeNullTasks();
+            } else {
+                this._tasks = [];
+            }
+
+            if (data.id === undefined) {
+                // We're loading an existing project.
+                _nextProjectId++;
+                this.onCreate();
+            } else {
+                // It's a new project.
+                _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
+            }
+        }
+
+        // Storable implementation
+
+        unpack(data) {
+            return new Project(data);
+        }
+
+        pack() {
+            let data = {
+                id: this.id,
+                name: this.name,
+                description: this.description,
+                taskIds: this._tasks.map(task => task.id),
+            };
+            return data;
+        }
+
+        destroy() {
+            for (let task of this._tasks) {
+                task.destroy();
+            }
+            super.destroy();
+        }
+
+        // Public methods
+
+        addTask(properties) {
+            if (typeof properties == "string") {
+                let title = properties;
+                properties = { title };
+            }
+            let item = new Task(properties);
+            this._tasks.push(item);
+            this.notifyChanged({ propertyName: "tasks" });
+        }
+
+        removeTask(criteria) {
+            let index = this._findRemovalIndex(criteria);
+            if (index >= 0) {
+                this._tasks[index].destroy();
+                this._tasks.splice(index, 1);
+                this.notifyChanged({ propertyName: "tasks" });
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        // Private helper methods
+
+        _findRemovalIndex(criteria) {
+            const NOT_FOUND = -1;
+            if (criteria instanceof Task) {
+                return this._tasks.indexOf(criteria);
+            }
+
+            if (typeof criteria == "number") {
+                let id = criteria;
+                criteria = { id };
+            } else if (typeof criteria == "string") {
+                let title = criteria;
+                criteria = { title };
+            } else if (!criteria) {
+                // Can't remove a null or undefined value.
+                return NOT_FOUND;
+            }
+
+            let removalIndex = this._tasks.findIndex((element) => {
+                for (key in criteria) {
+                    if (element[key] != criteria[key]) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+            return removalIndex;
+        }
+
+        _removeNullTasks() {
+            let startingCount = this._tasks.length;
+            this._tasks = this._tasks.filter((task) => !!task);
+            if (this._tasks.length < startingCount) {
+                let nullCount = startingCount - this._tasks.length;
+                console.warn(`${nullCount} null/undefined task(s) were removed.`);
+            }
         }
     }
 
-    Project.prototype = Object.create(Observable.prototype);
-
-    Project.prototype.initialize = function(name, description = "") {
-        this.name = name;
-        this.description = description;
-        this._tasks = [];
-        this._id = _nextProjectId++;
-        this.save();
-    };
-
-    Project.prototype.initFromData = function(data) {
-        this.name = data.name;
-        this.description = data.description ?? "";
-        if (data.taskIds) {
-            this._tasks = data.taskIds.map(id => storage.load("Task", id));
-            this._removeNullTasks();
-        } else {
-            this._tasks = [];
-        }
-        this._id = data.id ?? _nextProjectId;
-        _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
-        this.save();
-    };
+    // !!! add properties to Project class
 
     // Storable implementation
 
-    Object.defineProperties(Project.prototype, {
-        typeName: {
-            value: "Project",
-            writable: false
-        },
-        id: {
-            get: function() { return this._id; }
-        }
+    Object.defineProperty(Project.prototype, "typeName", {
+        value: "Project",
+        writable: false,
     });
 
-    Project.prototype.unpack = function(data) {
-        return new Project(data);
-    };
-
-    Project.prototype.pack = function() {
-        let data = {
-            id: this.id,
-            name: this.name,
-            description: this.description,
-            taskIds: this._tasks.map(task => task.id),
-        };
-        return data;
-    };
-
-    Project.prototype.wipeSave = function() {
-        for (let task of this._tasks) {
-            task.wipeSave();
-        }
-        storage.wipe(this);
-    };
-
-    storage.registerType(Project.prototype);
+    autosave.registerType(Project.prototype);
 
     // Properties
 
@@ -257,7 +317,7 @@ const todo = (function() {
                     throw new Error("Project name cannot be empty");
                 }
                 this._name = str;
-                this.save();
+                this.notifyChanged({ propertyName: "name" });
             },
         },
         description: {
@@ -266,7 +326,7 @@ const todo = (function() {
             },
             set: function(str) {
                 this._description = str;
-                this.save();
+                this.notifyChanged({ propertyName: "description" });
             },
         },
         allTasks: {
@@ -290,140 +350,153 @@ const todo = (function() {
         },
     });
 
-    // Public methods
-
-    Project.prototype.addTask = function(properties) {
-        if (typeof properties == "string") {
-            let title = properties;
-            properties = { title };
-        }
-        let item = new Task(properties);
-        this._tasks.push(item);
-        this.save();
-    };
-
-    Project.prototype.removeTask = function(criteria) {
-        let index = this._findRemovalIndex(criteria);
-        if (index >= 0) {
-            storage.wipe(this._tasks[index]);
-            this._tasks.splice(index, 1);
-            this.save();
-            return true;
-        } else {
-            return false;
-        }
-    };
-
-    // Public helper methods
-
-    Project.prototype._findRemovalIndex = function(criteria) {
-        const NOT_FOUND = -1;
-        if (criteria instanceof Task) {
-            return this._tasks.indexOf(criteria);
-        }
-        
-        if (typeof criteria == "number") {
-            let id = criteria;
-            criteria = { id };
-        } else if (typeof criteria == "string") {
-            let title = criteria;
-            criteria = { title };
-        } else if (!criteria) {
-            // Can't remove a null or undefined value.
-            return NOT_FOUND;
-        }
-
-        let removalIndex = this._tasks.findIndex((element) => {
-            for (key in criteria) {
-                if (element[key] != criteria[key]) {
-                    return false;
-                }
-            }
-            return true;
-        });
-        return removalIndex;
-    };
-
-    Project.prototype._removeNullTasks = function() {
-        let startingCount = this._tasks.length;
-        this._tasks = this._tasks.filter((task) => !!task);
-        if (this._tasks.length < startingCount) {
-            let nullCount = startingCount - this._tasks.length;
-            console.warn(`${nullCount} null/undefined task(s) were removed.`);
-        }
-    }
-
     //=========================================================================
     // Workspace
     // Manages a list of projects
     //=========================================================================
 
-    const Workspace = function(data={}) {
-        if (data.projectPreviews) {
-            this._projectPreviews = data.projectPreviews.slice();
-        } else {
-            this._projectPreviews = [];
+    const WORKSPACE_ID = "only";
+
+    class Workspace extends autosave.AutosavingObservable {
+        constructor(data = {}) {
+            super(WORKSPACE_ID);
+
+            if (data.projectPreviews) {
+                this._projectPreviews = data.projectPreviews.slice();
+            } else {
+                this._projectPreviews = [];
+            }
+
+            this._currentProject = null;
+            if (0 == this._projectPreviews.length) {
+                this._currentProject = this.addDefaultProject();
+            } else if (data.currentProject) {
+                this.setProject(data.currentProjectId);
+            } else {
+                this.setProject(this._projectPreviews[0]);
+            }
+
+            if (data.id === undefined) {
+                this.onCreate();
+            }
         }
 
-        this._currentProject = null;
-        if (0 == this._projectPreviews.length) {
-            this._currentProject = this.addDefaultProject();
-        } else if (data.currentProject) {
-            this.setProject(data.currentProjectId);
-        } else {
-            this.setProject(this._projectPreviews[0]);
-        }
-    };
+        // Storable implementation
 
-    Workspace.prototype = Object.create(Observable.prototype);
+        get typeName() {
+            return "Workspace";
+        }
+
+        pack() {
+            let data = {
+                projectPreviews: this.projectPreviews,
+                currentProjectId: this.currentProjectId,
+            };
+            return data;
+        }
+
+        unpack(data) {
+            return new Workspace(data);
+        }
+
+        destroy() {
+            for (let preview of this._projectPreviews) {
+                let project = this.getProject(preview);
+                project.destroy();
+            }
+            super.destroy();
+        }
+
+        addProject(name, description = "") {
+            let project = new Project(name, description);
+            let projectPreview = { id: project.id, name: project.name };
+            this._projectPreviews.push(projectPreview);
+            this.notifyChanged({ propertyName: "projectPreviews" });
+            return project;
+        }
+
+        addDefaultProject() {
+            let project = this.addProject("Default Project", "");
+            project.addTask("Add to-do items");
+            return project;
+        }
+
+        getProjectAt(index) {
+            return getProject(this._projectPreviews[index]);
+        }
+
+        getProject(projHandle) {
+            // Check if already in its final form
+            if (projHandle === null || projHandle === undefined) {
+                return null;
+            } else if (projHandle instanceof Project) {
+                return projHandle;
+            }
+
+            // Get the project ID
+            let id = 'id' in projHandle ? projHandle.id : projHandle;
+
+            // Get the project based on the ID
+            if (this._currentProject && id == this._currentProject.id) {
+                return this._currentProject;
+            } else {
+                let project = autosave.load("Project", id);
+                return project;
+            }
+        }
+
+        setProject(proj) {
+            this._currentProject = this.getProject(proj);
+            this.notifyChanged({ propertyName: "currentProject" });
+            return this._currentProject;
+        }
+
+        removeProject(projHandle) {
+            // Destroy project
+            let project = this.getProject(projHandle);
+            if (project) {
+                if (project == this.currentProject) {
+                    this.currentProject = null;
+                }
+                project.destroy();
+            }
+
+            // Remove project preview from list
+            let id = 'id' in projHandle ? projHandle.id : projHandle;
+            let index = this._projectPreviews.find(
+                preview => preview.id == id
+            );
+            if (index >= 0) {
+                this._projectPreviews.splice(index, 1);
+            }
+            this.notifyChanged({ propertyName: "projectPreviews" });
+
+            // If the current project was deleted,
+            // set the current project to something else.
+            if (id == this.currentProject.id) {
+                if (this._projectPreviews.length > 0) {
+                    this.setProject(this._projectPreviews[0]);
+                } else {
+                    this.setProject(null);
+                }
+            }
+        }
+    }
+
+    autosave.registerType(Workspace.prototype);
+
+    // !!! add properties to Workspace class
 
     // Storable interface
 
-    Object.defineProperties(Workspace.prototype, {
-        id: {
-            value: "only",
-            writable: false,
-        },
-        priority: {
-            value: Priority,
-            writable: false,
-        },
-        typeName: {
-            value: "Workspace",
-            writable: false,
-        },
+    Object.defineProperty(Workspace.prototype, "typeName", {
+        value: "Workspace",
+        writable: false,
     });
-
-    Workspace.prototype.pack = function() {
-        let data = {
-            projectPreviews: this.projectPreviews,
-            currentProjectId: this.currentProjectId,
-        }
-        return data;
-    };
-
-    Workspace.prototype.unpack = function(data) {
-        return new Workspace(data);
-    };
-
-    Workspace.prototype.wipeSave = function() {
-        for (let preview of this._projectPreviews) {
-            let project = this.getProject(preview);
-            project.wipeSave();
-        }
-        storage.wipe(this);
-    };
-
-    storage.registerType(Workspace.prototype);
 
     // Public properties
 
     Object.defineProperties(Workspace.prototype, {
-        projectPreviews: {
-            get: function() {
-                return this._projectPreviews.slice();
-            }
-        },
         currentProject: {
             get: function() {
                 return this._currentProject;
@@ -438,85 +511,22 @@ const todo = (function() {
                 }
             },
         },
+        priority: {
+            value: Priority,
+            writable: false,
+        },
+        projectPreviews: {
+            get: function() {
+                return this._projectPreviews.slice();
+            }
+        },
     });
 
-    Workspace.prototype.addProject = function(name, description = "") {
-        let project = new Project(name, description);
-        let projectPreview = { id: project.id, name: project.name };
-        this._projectPreviews.push(projectPreview);
-        this.save();
-        return project;
-    };
-
-    Workspace.prototype.addDefaultProject = function() {
-        let project = this.addProject("Default Project", "");
-        project.addTask("Add to-do items");
-        return project;
-    };
-
-    Workspace.prototype.getProjectAt = function(index) {
-        return getProject(this._projectPreviews[index]);
-    };
-
-    Workspace.prototype.getProject = function(projHandle) {
-        // Check if already in its final form
-        if (projHandle === null || projHandle === undefined) {
-            return null;
-        } else if (projHandle instanceof Project) {
-            return projHandle;
-        }
-
-        // Get the project ID
-        let id = 'id' in projHandle ? projHandle.id : projHandle;
-        
-        // Get the project based on the ID
-        if (this._currentProject && id == this._currentProject.id) {
-            return this._currentProject;
-        } else {
-            let project = storage.load("Project", id);
-            return project;
-        }
-    };
-
-    Workspace.prototype.setProject = function(proj) {
-        this._currentProject = this.getProject(proj);
-        this.save();
-        return this._currentProject;
-    };
-
-    Workspace.prototype.removeProject = function(projHandle) {
-        // Wipe project save
-        let project = this.getProject(projHandle);
-        if (project) {
-            if (project == this.currentProject) {
-                this.currentProject = null;
-            }
-            project.wipeSave();
-        }
-
-        // Remove project preview from list
-        let id = 'id' in projHandle ? projHandle.id : projHandle;
-        let index = this._projectPreviews.find(
-            preview => preview.id == id
-        );
-        if (index >= 0) {
-            this._projectPreviews.splice(index, 1);
-        }
-
-        // If the current project was deleted,
-        // set the current project to something else.
-        if (id == this.currentProject.id) {
-            if (this._projectPreviews.length > 0) {
-                this.setProject(this._projectPreviews[0]);
-            } else {
-                this.setProject(null);
-            }
-        }
-    };
-
+    //=========================================================================
     // Module returns
+    //=========================================================================
 
-    let todoSpace = storage.load("Workspace", "only");
+    let todoSpace = autosave.load("Workspace", "only");
     if (!todoSpace) {
         todoSpace = new Workspace();
     }

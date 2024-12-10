@@ -11,7 +11,7 @@ const storage = (function() {
             const usageMessage =
                 "Storable functions require the following:" +
                 "\nProperties: " + _STORABLE_PROPERTIES.join(", ") +
-                "\nMethods" + _STORABLE_METHODS.join(", ");
+                "\nMethods: " + _STORABLE_METHODS.join(", ");
             throw new Error(usageMessage);
         }
         if (!proto.save) {
