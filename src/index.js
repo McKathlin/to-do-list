@@ -93,7 +93,7 @@ const MainPageController = (function() {
     };
 
     const _makeToDoNode = function(task) {
-        const buttonComplete = doc.make("button.complete-button", "Done!");
+        const buttonComplete = doc.make("button.complete-button", "Done");
         buttonComplete.addEventListener("click", function(event) {
             markComplete(task);
         });

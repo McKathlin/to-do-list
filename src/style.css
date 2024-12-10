@@ -19,7 +19,7 @@ body {
     --header-text-color: #abf1d6;
     --header-back-color: #00504c;
     
-    --edge-color: #10002880;
+    --edge-color: #10002870;
     --shadow-color: #00082820;
     --dimmer-color: #00001880;
 
@@ -35,6 +35,7 @@ body {
     --item-shadow: 2px 2px 1px var(--shadow-color);
 
     --default-font: Verdana, Geneva, Tahoma, sans-serif;
+    --brand-font: "Lobster", Georgia, serif;
 
     --header-height: 7rem;
     --footer-height: 2rem;
@@ -57,7 +58,7 @@ body {
         --header-back-color: #002e2b;
         --create-color: #0b4e45;
 
-        --edge-color: #fff8e080;
+        --edge-color: #fff8e070;
         --shadow-color: #00000040;
         --dimmer-color: #000000a0;
 
@@ -84,6 +85,11 @@ button {
     border-radius: 3px;
     padding: 2px 5px;
     cursor: pointer;
+    opacity: 0.8;
+}
+
+button:hover {
+    opacity: 1.0;
 }
 
 h1, h2, h3 {
@@ -116,12 +122,11 @@ header {
 }
 
 header h1 {
-    font-family: "Lobster", Georgia, serif;
+    font-family: var(--brand-font);
     font-size: 3rem;
     font-weight: 400;
     font-style: normal;
     color: var(--header-text-color);
-    transform: scale(1.4, 1.0);
     margin-top: 0.8rem;
 }
 
@@ -161,6 +166,7 @@ header .disclaimer {
 #project-list button.current {
     color: var(--strong-text-color);
     background-color: var(--back-color);
+    opacity: 1.0;
 
     /* Close any seam with main area below */
     position: relative;
@@ -195,7 +201,7 @@ header .disclaimer {
     margin: auto;
 }
 
-/* Task List Section */
+/* To-Do Task List Section */
 
 #task-list-section {
     background-color: var(--container-back-color);
@@ -225,9 +231,10 @@ header .disclaimer {
 #task-list-container .task {
     color: var(--text-color);
     background-color: var(--back-color);
+    cursor: pointer;
 
-    border: 0.1rem solid var(--edge-color);
-    border-radius: 0.3rem;
+    border: 1px solid var(--edge-color);
+    border-radius: 0.4rem;
     box-shadow: var(--item-shadow);
 
     padding: 0.2rem;
@@ -235,7 +242,11 @@ header .disclaimer {
     width: 100%;
 
     display: grid;
-    grid-template-columns: auto 9.5rem 5rem;
+    grid-template-columns: auto 9.5rem 4rem;
+}
+
+#task-list-container .task * {
+    line-height: 1.8rem;
 }
 
 #task-list-container .task.top-priority {
@@ -258,8 +269,17 @@ header .disclaimer {
     background-color: var(--low-priority-color);
 }
 
-#new-task-show-button {
+#task-list-container .task button.complete-button {
+    padding: 0;
+    line-height: 1.6rem;
+    background-color: var(--create-color);
+    border-color: var(--edge-color);
+} 
+
+button#new-task-show-button {
+    background-color: var(--back-color);
     margin: 0.5rem auto;
+    min-width: 10rem;
 }
 
 /* Completed Tasks Section */
@@ -382,7 +402,7 @@ footer a {
 
     button {
         padding: 0.3rem;
-        min-width: 5rem;
+        min-width: 4rem;
         background-color: var(--back-color);
     }
 
