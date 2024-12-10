@@ -49,7 +49,7 @@
     </footer>
     <div id="project-dialog" class="hidden dialog-container">
         <form id="project-form" class="dialog">
-            <h2 class="dialog-head">Create Project</h2>
+            <h2 id="project-form-heading" class="dialog-head">Create Project</h2>
             <label for="project-name">Project name:</label>
             <input
                 id="project-name"
@@ -58,12 +58,20 @@
                 type="text"
                 required>
             <label for="project-description">Description:</label>
-            <textarea
-                id="project-description"
-                name="project-description"></textarea>
-            <div class="button-row">
-                <button type="submit" id="project-submit">Create</button>
-                <button type="button" id="project-cancel">Cancel</button>
+            <textarea id="project-description" name="project-description"></textarea>
+            <div id="project-button-row" class="button-row">
+                <button id="project-submit" type="submit">Submit</button>
+                <button id="project-cancel" type="button" class="cancel">Cancel</button>
+                <div class="actions-dropdown dropdown-container">
+                    <button type="button" class="menu-button">...</button>
+                    <menu class="dropdown-menu">
+                        <button id="project-start-delete" type="button" class="delete">Delete</button>
+                    </menu>
+                </div>
+            </div>
+            <div id="delete-project-button-row" class="button-row hidden">
+                <button id="delete-project-confirm" type="button" class="delete">Confirm Delete</button>
+                <button id="delete-project-cancel" type="button" class="cancel">Cancel Deletion</button>
             </div>
         </form>
     </div>

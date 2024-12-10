@@ -141,25 +141,42 @@ const MainPageController = (function() {
 // Project Form Controller
 //=============================================================================
 
-const NewProjectFormController = (function() {
+const ProjectFormController = (function() {
+
+    let _currentProject = null;
+
     // Nodes
+
     const newProjectShowButton =
         document.getElementById("new-project-button");
     const editProjectShowButton =
         document.getElementById("edit-project-button");
 
-    const newProjectDialog =
+    const projectDialog =
         document.getElementById("project-dialog");
-    const newProjectForm =
+    const projectForm =
         document.getElementById("project-form");
-    const projectNameInput =
+    const nameInput =
         document.getElementById("project-name");
-    const projectDescriptionInput = 
+    const descriptionInput = 
         document.getElementById("project-description");
-    const newProjectSubmit =
+    
+    const buttonRow =
+        document.getElementById("project-button-row");
+    const submitButton =
         document.getElementById("project-submit");
-    const newProjectCancel =
+    const cancelButton =
         document.getElementById("project-cancel");
+    
+    const startDeleteButton =
+        document.getElementById("project-start-delete");
+
+    const deleteButtonRow =
+        document.getElementById("delete-project-button-row");
+    const confirmDeleteButton =
+        document.getElementById("delete-project-confirm");
+    const cancelDeleteButton =
+        document.getElementById("delete-project-cancel");
 
     // Setup
 
@@ -168,43 +185,88 @@ const NewProjectFormController = (function() {
     });
 
     editProjectShowButton.addEventListener("click", function(event) {
-        showEditDialog();
+        showEditDialog(todo.currentProject);
     });
 
-    newProjectSubmit.addEventListener("click", function(event) {
-        if (newProjectForm.checkValidity() == false) {
+    submitButton.addEventListener("click", function(event) {
+        if (projectForm.checkValidity() == false) {
             return; // Do built-in validation and nothing else
         }
         event.preventDefault();
-        const name = projectNameInput.value;
-        const description = projectDescriptionInput.value;
-        addProject(name, description);
+
+        const props = {
+            name: nameInput.value,
+            description: descriptionInput.value,
+        }
+
+        if (_currentProject) {
+            editProject(_currentProject, props);
+        } else {
+            addProject(props);
+        }
         hideDialog();
     });
 
-    newProjectCancel.addEventListener("click", function(event) {
+    cancelButton.addEventListener("click", function(event) {
         hideDialog();
     });
+
+    startDeleteButton.addEventListener("click", function(event) {
+        startDeleteMode();
+    });
+
+    cancelDeleteButton.addEventListener("click", function(event) {
+        endDeleteMode();
+    });
+
+    confirmDeleteButton.addEventListener("click", function(event) {
+        deleteProject(_currentProject);
+    })
+
+    const startDeleteMode = function() {
+        buttonRow.classList.add("hidden");
+        deleteButtonRow.classList.remove("hidden");
+    };
+
+    const endDeleteMode = function() {
+        deleteButtonRow.classList.add("hidden");
+        buttonRow.classList.remove("hidden");
+    };
 
     // Public methods
 
     const showCreateDialog = function() {
-        newProjectDialog.classList.remove("hidden");
+        _currentProject = null;
+        nameInput.value = "";
+        descriptionInput.value = "";
+        projectDialog.classList.remove("hidden");
     };
 
     const showEditDialog = function(project) {
-        // !!!
+        _currentProject = project;
+        nameInput.value = project.name;
+        descriptionInput.value = project.description;
+        projectDialog.classList.remove("hidden");
     };
 
     const hideDialog = function() {
-        newProjectDialog.classList.add("hidden");
-        projectNameInput.value = "";
-        projectDescriptionInput.value = "";
+        projectDialog.classList.add("hidden");
     };
 
-    const addProject = function(name, description = "") {
-        let project = todo.addProject(name, description);
+    const addProject = function(properties) {
+        let project = todo.addProject(properties);
         MainPageController.setProject(project);
+    };
+
+    const editProject = function(project, properties) {
+        project.name = properties.name;
+        project.description = properties.description;
+        MainPageController.refresh();
+    };
+
+    const deleteProject = function(project) {
+        todo.removeProject(project);
+        MainPageController.refresh();
     };
 
     return {
