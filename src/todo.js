@@ -196,6 +196,7 @@ const todo = (function() {
         this.description = data.description ?? "";
         if (data.taskIds) {
             this._tasks = data.taskIds.map(id => storage.load("Task", id));
+            this._removeNullTasks();
         } else {
             this._tasks = [];
         }
@@ -280,7 +281,7 @@ const todo = (function() {
         },
     });
 
-    // Methods
+    // Public methods
 
     Project.prototype.addTask = function(properties) {
         if (typeof properties == "string") {
@@ -303,6 +304,8 @@ const todo = (function() {
             return false;
         }
     };
+
+    // Public helper methods
 
     Project.prototype._findRemovalIndex = function(criteria) {
         const NOT_FOUND = -1;
@@ -331,6 +334,15 @@ const todo = (function() {
         });
         return removalIndex;
     };
+
+    Project.prototype._removeNullTasks = function() {
+        let startingCount = this._tasks.length;
+        this._tasks = this._tasks.filter((task) => !!task);
+        if (this._tasks.length < startingCount) {
+            let nullCount = startingCount - this._tasks.length;
+            console.warn(`${nullCount} null/undefined task(s) were removed.`);
+        }
+    }
 
     //=========================================================================
     // Workspace
