@@ -228,7 +228,6 @@ const TaskFormController = (function() {
     // Variables
 
     let _currentTask = null;
-    let _deletePending = false;
 
     // Nodes
 
@@ -250,10 +249,21 @@ const TaskFormController = (function() {
     const dueDateInput =
         document.getElementById("task-due-date");
     
+    const buttonRow =
+        document.getElementById("task-button-row");
     const submitButton =
         document.getElementById("task-submit");
+    const startDeleteButton =
+        document.getElementById("task-start-delete");
     const cancelButton =
         document.getElementById("task-cancel");
+    
+    const deleteButtonRow =
+        document.getElementById("delete-task-button-row");
+    const confirmDeleteButton =
+        document.getElementById("delete-task-confirm");
+    const cancelDeleteButton =
+        document.getElementById("delete-task-cancel");
     
     // Setup
 
@@ -283,11 +293,24 @@ const TaskFormController = (function() {
         hideDialog();
     });
 
+    startDeleteButton.addEventListener("click", function(event) {
+        startDeleteMode();
+    });
+
     cancelButton.addEventListener("click", function(event) {
         hideDialog();
     });
 
-    // Public methods
+    confirmDeleteButton.addEventListener("click", function(event) {
+        deleteTask(_currentTask);
+        hideDialog();
+    });
+
+    cancelDeleteButton.addEventListener("click", function(event) {
+        endDeleteMode();
+    });
+
+    // Dialog display
 
     const showDialog = function(task = null) {
         taskDialog.classList.remove("hidden");
@@ -321,7 +344,20 @@ const TaskFormController = (function() {
     const hideDialog = function() {
         _currentTask = null;
         taskDialog.classList.add("hidden");
+        endDeleteMode();
     };
+
+    const startDeleteMode = function() {
+        buttonRow.classList.add("hidden");
+        deleteButtonRow.classList.remove("hidden");
+    };
+
+    const endDeleteMode = function() {
+        deleteButtonRow.classList.add("hidden");
+        buttonRow.classList.remove("hidden");
+    };
+
+    // Actions
 
     const addTask = function(properties) {
         todo.currentProject.addTask(properties);
@@ -336,10 +372,17 @@ const TaskFormController = (function() {
         MainPageController.refresh();
     };
 
+    const deleteTask = function(task) {
+        todo.currentProject.removeTask(task);
+        MainPageController.refresh();
+    };
+
     return {
         showDialog,
         hideDialog,
         addTask,
+        editTask,
+        deleteTask
     };
 })();
 

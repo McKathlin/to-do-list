@@ -83,9 +83,14 @@
             <input id="task-due-date"
                 name="task-due-date"
                 type="date">
-            <div class="button-row">
+            <div id="task-button-row" class="button-row">
                 <button id="task-submit" type="submit">Submit</button>
-                <button id="task-cancel" type="button">Cancel</button>
+                <button id="task-start-delete" type="button" class="delete">Delete</button>
+                <button id="task-cancel" type="button" class="cancel">Cancel</button>
+            </div>
+            <div id="delete-task-button-row" class="button-row hidden">
+                <button id="delete-task-confirm" type="button" class="delete">Confirm Delete</button>
+                <button id="delete-task-cancel" type="button" class="cancel">Cancel Deletion</button>
             </div>
         </form>
     </div>

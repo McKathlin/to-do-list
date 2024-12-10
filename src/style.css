@@ -18,7 +18,6 @@ body {
 
     --header-text-color: #ffffff;
     --header-back-color: #194381;
-    --create-color: #4ae2af;
     
     --edge-color: #10002880;
     --shadow-color: #00082820;
@@ -28,6 +27,9 @@ body {
     --high-priority-color: #fcbb67;
     --medium-priority-color: #f1f1a2;
     --low-priority-color: var(--back-color);
+
+    --create-color: #4ae2af;
+    --danger-color: var(--top-priority-color);
 
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
     --item-shadow: 2px 2px 1px var(--shadow-color);
@@ -341,12 +343,28 @@ footer {
         gap: 1rem;
     }
 
+    button {
+        background-color: var(--back-color);
+    }
+
     button[type='submit'] {
         font-weight: bold;
         background-color: var(--create-color);
     }
 
-    button[type='button'] {
+    button.delete {
+        background-color: var(--danger-color);
+    }
+}
+
+.dialog.create {
+    button.delete {
+        display: none;
+    }
+}
+
+.dialog.edit {
+    .dialog-head {
         background-color: var(--back-color);
     }
 }
