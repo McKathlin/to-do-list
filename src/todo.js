@@ -494,9 +494,16 @@ const todo = (function() {
         );
         if (index >= 0) {
             this._projectPreviews.splice(index, 1);
-            return true;
-        } else {
-            return false;
+        }
+
+        // If the current project was deleted,
+        // set the current project to something else.
+        if (id == this.currentProject.id) {
+            if (this._projectPreviews.length > 0) {
+                this.setProject(this._projectPreviews[0]);
+            } else {
+                this.setProject(null);
+            }
         }
     };
 
