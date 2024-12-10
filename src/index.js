@@ -228,6 +228,7 @@ const TaskFormController = (function() {
     // Variables
 
     let _currentTask = null;
+    let _deletePending = false;
 
     // Nodes
 
@@ -238,19 +239,20 @@ const TaskFormController = (function() {
         document.getElementById("task-dialog");
     const taskForm =
         document.getElementById("task-form");
-    const taskFormHeading =
+    const formHeading =
         document.getElementById("task-form-heading");
-    const taskTitleInput =
+    const titleInput =
         document.getElementById("task-title");
-    const taskDescriptionInput =
+    const descriptionInput =
         document.getElementById("task-description");
-    const taskPriorityInput =
+    const priorityInput =
         document.getElementById("task-priority");
-    const taskDueDateInput =
+    const dueDateInput =
         document.getElementById("task-due-date");
-    const taskSubmitButton =
+    
+    const submitButton =
         document.getElementById("task-submit");
-    const taskCancelButton =
+    const cancelButton =
         document.getElementById("task-cancel");
     
     // Setup
@@ -259,7 +261,7 @@ const TaskFormController = (function() {
         showDialog();
     });
 
-    taskSubmitButton.addEventListener("click", function(event) {
+    submitButton.addEventListener("click", function(event) {
         if (taskForm.checkValidity() == false) {
             return; // Do built-in validation and nothing else.
         }
@@ -267,10 +269,10 @@ const TaskFormController = (function() {
         
         // Gather properties
         let properties = {
-            title: taskTitleInput.value,
-            description: taskDescriptionInput.value,
-            priority: Number.parseInt(taskPriorityInput.value),
-            dueDate: dateDiffs.inputToLocalEOD(taskDueDateInput.value),
+            title: titleInput.value,
+            description: descriptionInput.value,
+            priority: Number.parseInt(priorityInput.value),
+            dueDate: dateDiffs.inputToLocalEOD(dueDateInput.value),
         };
 
         if (_currentTask) {
@@ -281,7 +283,7 @@ const TaskFormController = (function() {
         hideDialog();
     });
 
-    taskCancelButton.addEventListener("click", function(event) {
+    cancelButton.addEventListener("click", function(event) {
         hideDialog();
     });
 
@@ -289,29 +291,30 @@ const TaskFormController = (function() {
 
     const showDialog = function(task = null) {
         taskDialog.classList.remove("hidden");
+        
         if (task) {
             // Edit Task
             _currentTask = task;
             taskForm.classList.remove("create");
             taskForm.classList.add("edit");
-            taskFormHeading.innerText = "Edit Task";
-            taskTitleInput.value = task.title;
-            taskDescriptionInput.value = task.description;
-            taskPriorityInput.value = task.priority;
-            taskDueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
-            taskSubmitButton.innerText = "Save";
+            formHeading.innerText = "Edit Task";
+            titleInput.value = task.title;
+            descriptionInput.value = task.description;
+            priorityInput.value = task.priority;
+            dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
+            submitButton.innerText = "Save";
             
         } else {
             // Create Task
             _currentTask = null;
             taskForm.classList.remove("edit");
             taskForm.classList.add("create");
-            taskFormHeading.innerText = "Create Task";
-            taskTitleInput.value = "";
-            taskDescriptionInput.value = "";
-            taskPriorityInput.value = todo.priority.MEDIUM;
-            taskDueDateInput.value = null;
-            taskSubmitButton.innerText = "Create";
+            formHeading.innerText = "Create Task";
+            titleInput.value = "";
+            descriptionInput.value = "";
+            priorityInput.value = todo.priority.MEDIUM;
+            dueDateInput.value = null;
+            submitButton.innerText = "Create";
         }
     };
 
