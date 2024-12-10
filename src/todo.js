@@ -271,6 +271,7 @@ const todo = (function() {
         },
         actionTasks: {
             get: function() {
+                // All non-complete tasks, sorted by priority
                 return this._tasks.filter(item => !item.isComplete())
                     .sort((a, b) => a.priority - b.priority);
             },

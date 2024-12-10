@@ -110,7 +110,7 @@ const MainPageController = (function() {
 
         toDoNode.addEventListener("click", function(event) {
             if (event.target != buttonComplete) {
-                TaskFormController.showDialog(task);
+                TaskFormController.showEditDialog(task);
             }
         });
         return toDoNode;
@@ -143,21 +143,32 @@ const MainPageController = (function() {
 
 const NewProjectFormController = (function() {
     // Nodes
-    const newProjectShowButton = document.getElementById(
-        "new-project-button");
+    const newProjectShowButton =
+        document.getElementById("new-project-button");
+    const editProjectShowButton =
+        document.getElementById("edit-project-button");
 
-    const newProjectDialog = document.getElementById("project-dialog");
-    const newProjectForm = document.getElementById("project-form");
-    const projectNameInput = document.getElementById("project-name");
-    const projectDescriptionInput = document.getElementById(
-        "project-description");
-    const newProjectSubmit = document.getElementById("project-submit");
-    const newProjectCancel = document.getElementById("project-cancel");
+    const newProjectDialog =
+        document.getElementById("project-dialog");
+    const newProjectForm =
+        document.getElementById("project-form");
+    const projectNameInput =
+        document.getElementById("project-name");
+    const projectDescriptionInput = 
+        document.getElementById("project-description");
+    const newProjectSubmit =
+        document.getElementById("project-submit");
+    const newProjectCancel =
+        document.getElementById("project-cancel");
 
     // Setup
 
     newProjectShowButton.addEventListener("click", function(event) {
-        showDialog();
+        showCreateDialog();
+    });
+
+    editProjectShowButton.addEventListener("click", function(event) {
+        showEditDialog();
     });
 
     newProjectSubmit.addEventListener("click", function(event) {
@@ -177,8 +188,12 @@ const NewProjectFormController = (function() {
 
     // Public methods
 
-    const showDialog = function() {
+    const showCreateDialog = function() {
         newProjectDialog.classList.remove("hidden");
+    };
+
+    const showEditDialog = function(project) {
+        // !!!
     };
 
     const hideDialog = function() {
@@ -193,29 +208,10 @@ const NewProjectFormController = (function() {
     };
 
     return {
-        showDialog,
+        showCreateDialog,
+        showEditDialog,
         hideDialog,
         addProject
-    };
-})();
-
-//=============================================================================
-// Project Edit Controller
-//=============================================================================
-
-const ProjectEditController = (function() {
-    // !!! add project edit mode
-
-    // !!! add project edit form
-
-    const removeProject = function(project) {
-        if (todo.removeProject(project)) {
-            MainPageController.refresh();
-        }
-    };
-
-    return {
-        removeProject,
     };
 })();
 
@@ -269,7 +265,7 @@ const TaskFormController = (function() {
     // Setup
 
     newTaskShowButton.addEventListener("click", function(event) {
-        showDialog();
+        showCreateDialog();
     });
 
     submitButton.addEventListener("click", function(event) {
@@ -313,33 +309,34 @@ const TaskFormController = (function() {
 
     // Dialog display
 
-    const showDialog = function(task = null) {
+    const showCreateDialog = function() {
+        _currentTask = null;
+
+        taskForm.classList.remove("edit");
+        taskForm.classList.add("create");
+        formHeading.innerText = "Create Task";
+        titleInput.value = "";
+        descriptionInput.value = "";
+        priorityInput.value = todo.priority.MEDIUM;
+        dueDateInput.value = null;
+        submitButton.innerText = "Create";
+
         taskDialog.classList.remove("hidden");
-        
-        if (task) {
-            // Edit Task
-            _currentTask = task;
-            taskForm.classList.remove("create");
-            taskForm.classList.add("edit");
-            formHeading.innerText = "Edit Task";
-            titleInput.value = task.title;
-            descriptionInput.value = task.description;
-            priorityInput.value = task.priority;
-            dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
-            submitButton.innerText = "Save";
-            
-        } else {
-            // Create Task
-            _currentTask = null;
-            taskForm.classList.remove("edit");
-            taskForm.classList.add("create");
-            formHeading.innerText = "Create Task";
-            titleInput.value = "";
-            descriptionInput.value = "";
-            priorityInput.value = todo.priority.MEDIUM;
-            dueDateInput.value = null;
-            submitButton.innerText = "Create";
-        }
+    };
+
+    const showEditDialog = function(task) {
+        _currentTask = task;
+
+        taskForm.classList.remove("create");
+        taskForm.classList.add("edit");
+        formHeading.innerText = "Edit Task";
+        titleInput.value = task.title;
+        descriptionInput.value = task.description;
+        priorityInput.value = task.priority;
+        dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
+        submitButton.innerText = "Save";
+
+        taskDialog.classList.remove("hidden");
     };
 
     const hideDialog = function() {
@@ -379,7 +376,8 @@ const TaskFormController = (function() {
     };
 
     return {
-        showDialog,
+        showCreateDialog,
+        showEditDialog,
         hideDialog,
         addTask,
         editTask,
