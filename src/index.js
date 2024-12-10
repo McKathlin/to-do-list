@@ -256,8 +256,6 @@ const TaskFormController = (function() {
     const cancelButton =
         document.getElementById("task-cancel");
     
-    const actionsDropdown =
-        document.getElementById("task-actions-dropdown");
     const startDeleteButton =
         document.getElementById("task-start-delete");
 
