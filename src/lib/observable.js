@@ -8,10 +8,16 @@ export default class Observable {
     }
 
     unsubscribe(onChange) {
-        this._observers = this._observers.filter((observer) => observer !== func);
+        this._observers = this._observers.filter(
+            (observer) => observer !== onChange);
     }
 
-    notifyChanged(event) {
+    unsubscribeAll() {
+        this._observers = [];
+    }
+
+    notifyChanged(event = {}) {
+        event.sender = this;
         this._observers.forEach((onChange) => onChange(event));
     }
 };
