@@ -4,6 +4,7 @@
 // Defines to-do items, projects, and priorities
 //=============================================================================
 import storage from "./lib/storage.js";
+import Observable from "./lib/observable.js";
 
 const todo = (function() {
     //=========================================================================
@@ -50,6 +51,8 @@ const todo = (function() {
         _nextTaskId = Math.max(_nextTaskId, this._id) + 1;
         this.save();
     }
+
+    Task.prototype = Object.create(Observable.prototype);
 
     // Storable implementation
 
@@ -182,6 +185,8 @@ const todo = (function() {
             this.initFromData(...arguments);
         }
     }
+
+    Project.prototype = Object.create(Observable.prototype);
 
     Project.prototype.initialize = function(name, description = "") {
         this.name = name;
@@ -369,6 +374,8 @@ const todo = (function() {
             this.setProject(this._projectPreviews[0]);
         }
     };
+
+    Workspace.prototype = Object.create(Observable.prototype);
 
     // Storable interface
 
