@@ -16,8 +16,8 @@ body {
     --back-color: #eeeeee;
     --container-back-color: #dddddd;
 
-    --header-text-color: #abf1e0;
-    --header-back-color: #194381;
+    --header-text-color: #abf1d6;
+    --header-back-color: #00504c;
     
     --edge-color: #10002880;
     --shadow-color: #00082820;
@@ -28,7 +28,7 @@ body {
     --medium-priority-color: #f1f1a2;
     --low-priority-color: var(--back-color);
 
-    --create-color: #4ae2af;
+    --create-color: #26d6b0;
     --danger-color: var(--top-priority-color);
 
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
@@ -54,7 +54,7 @@ body {
         --container-back-color: #282828;
 
         --header-text-color: #09b9a1;
-        --header-back-color: #070847;
+        --header-back-color: #00302d;
         --create-color: #0b4e45;
 
         --edge-color: #fff8e080;
