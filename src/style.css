@@ -16,7 +16,7 @@ body {
     --back-color: #eeeeee;
     --container-back-color: #dddddd;
 
-    --header-text-color: #ffffff;
+    --header-text-color: #abf1e0;
     --header-back-color: #194381;
     
     --edge-color: #10002880;
@@ -53,8 +53,8 @@ body {
         --back-color: #303030;
         --container-back-color: #282828;
 
-        --header-text-color: #88b8ff;
-        --header-back-color: #000000;
+        --header-text-color: #09b9a1;
+        --header-back-color: #070847;
         --create-color: #0b4e45;
 
         --edge-color: #fff8e080;
@@ -102,6 +102,10 @@ main section {
 
 header {
     color: var(--header-text-color);
+    background: linear-gradient(
+        transparent,
+        var(--dimmer-color)
+    );
     background-color: var(--header-back-color);
     height: var(--header-height);
     text-align: center;
@@ -112,7 +116,12 @@ header {
 }
 
 header h1 {
+    font-family: "Lobster", Georgia, serif;
+    font-size: 3rem;
+    font-weight: 400;
+    font-style: normal;
     color: var(--header-text-color);
+    transform: scale(1.4, 1.0);
     margin-top: 0.8rem;
 }
 
@@ -269,6 +278,10 @@ header .disclaimer {
 
 footer {
     color: var(--header-text-color);
+    background: linear-gradient(
+        var(--dimmer-color),
+        var(--dimmer-color)
+    );
     background-color: var(--header-back-color);
     text-align: center;
     line-height: var(--footer-height);
