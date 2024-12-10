@@ -335,7 +335,7 @@ footer {
     }
     
     .button-row {
-        margin: 0.5rem;
+        margin: 1.5rem 0.5rem 0.5rem 0.5rem;
     
         display: flex;
         flex-direction: row;
@@ -344,6 +344,8 @@ footer {
     }
 
     button {
+        padding: 0.3rem;
+        min-width: 5rem;
         background-color: var(--back-color);
     }
 
