@@ -49,11 +49,9 @@ const storage = (function() {
     const load = function(typeName, id) {
         const json = localStorage.getItem(_makeKey(typeName, id));
         if (!json) {
-            console.log("Not found for loading:", typeName, id);
             return null; // Nothing to load.
         }
         
-        console.log("Loading", typeName, id);
         try {
             const data = JSON.parse(json);
             const unpack = _unpackers[typeName];
@@ -70,7 +68,6 @@ const storage = (function() {
             throw new Error("Can't save non-storable", storable);
         }
 
-        console.log("Saving", storable);
         try {
             const key = _makeKey(storable.typeName, storable.id);
             localStorage.setItem(key, JSON.stringify(storable.pack()));
@@ -85,8 +82,6 @@ const storage = (function() {
         if (!storable) {
             throw new Error("Can't wipe non-storable", storable);
         }
-
-        console.log("Wiping", storable);
 
         try {
             const key = _makeKey(storable.typeName, storable.id);
