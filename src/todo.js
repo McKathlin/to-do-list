@@ -466,25 +466,24 @@ const todo = (function() {
         }
 
         removeProject(projHandle) {
+            const currentId = this.currentProject ? this.currentProject.id : null;
+
+            // Remove project preview from list
+            let idToRemove = 'id' in projHandle ? projHandle.id : projHandle;
+            this._projectPreviews = this._projectPreviews.filter(
+                (p) => p.id != idToRemove
+            );
+            this.notifyChanged({ propertyName: "projectPreviews" });
+
             // Destroy project
             let project = this.getProject(projHandle);
             if (project) {
                 project.destroy();
             }
 
-            // Remove project preview from list
-            let id = 'id' in projHandle ? projHandle.id : projHandle;
-            let index = this._projectPreviews.find(
-                preview => preview.id == id
-            );
-            if (index >= 0) {
-                this._projectPreviews.splice(index, 1);
-            }
-            this.notifyChanged({ propertyName: "projectPreviews" });
-
             // If the current project was deleted,
             // set the current project to something else.
-            if (id == this.currentProject.id) {
+            if (idToRemove === currentId) {
                 if (this._projectPreviews.length > 0) {
                     this.setProject(this._projectPreviews[0]);
                 } else {
