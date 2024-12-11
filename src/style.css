@@ -242,10 +242,9 @@ header .disclaimer {
 #task-list-section .section-title {
     text-align: center;
     margin: 0.3rem auto;
-    background-color: var(--shadow-color);
     width: 12ch;
     line-height: 2rem;
-    border-radius: 0.5lh;
+    border-bottom: 2px solid var(--shadow-color);
 }
 
 #task-list-container {
