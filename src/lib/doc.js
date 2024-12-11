@@ -119,6 +119,6 @@ const doc = (function() {
     module.br = function() { return document.createElement("br"); }
 
     return module;
-})();
+}());
 
 export default doc;

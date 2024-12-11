@@ -513,6 +513,6 @@ const todo = (function() {
     }
 
     return todoSpace;
-})();
+}());
 
 export default todo;

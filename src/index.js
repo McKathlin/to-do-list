@@ -183,7 +183,7 @@ const MainPageController = (function() {
         setProject,
         refresh
     };
-})();
+}());
 
 //=============================================================================
 // Project Form Controller
@@ -350,7 +350,7 @@ const ProjectFormController = (function() {
         hideDialog,
         addProject
     };
-})();
+}());
 
 //=============================================================================
 // Task Form Controller
@@ -551,6 +551,6 @@ const TaskFormController = (function() {
         editTask,
         deleteTask
     };
-})();
+}());
 
 MainPageController.refresh();

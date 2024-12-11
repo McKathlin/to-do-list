@@ -204,6 +204,6 @@ const dateDiffs = (function() {
     });
 
     return myModule;
-})();
+}());
 
 export default dateDiffs;

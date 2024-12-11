@@ -21,7 +21,7 @@ const _idGenerator = (function() {
     };
 
     return { generateFor };
-})();
+}());
 
 // This Observable saves whenever a change is made.
 class AutosavingObservable extends Observable {

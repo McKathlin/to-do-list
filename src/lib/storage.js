@@ -117,6 +117,6 @@ const storage = (function() {
         save, savePrimitive,
         wipe, wipePrimitive,
     };
-})();
+}());
 
 export default storage;
