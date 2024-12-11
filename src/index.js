@@ -103,21 +103,36 @@ const MainPageController = (function() {
     };
 
     const _makeToDoNode = function(task) {
-        const buttonComplete = doc.make("button.complete-button", "Done");
+        let buttonComplete = doc.make("button.complete-button", "Done");
         buttonComplete.addEventListener("click", function(event) {
             markComplete(task);
         });
 
-        const priority = task.priorityWord.toLowerCase();
-        const duePhrase = task.dueDate ?
-            "Due " + dateDiffs.daysFromTodayString(task.dueDate) :
-            "No due date";
-        const toDoNode = doc.make(`.task.${priority}-priority`, [
-            doc.make(".title", task.title),
-            doc.make(".due-date", duePhrase),
-            buttonComplete,
-        ]);
+        let priority = task.priorityWord.toLowerCase();
+        let dueNode = doc.make(".due-date");
+        if (task.dueDate) {
+            dueNode.append(
+                doc.make("span.optional-text", "due "),
+                doc.span(dateDiffs.daysFromTodayString(task.dueDate))
+            );
 
+            let daysFromNow = dateDiffs.businessDaysFromToday(task.dueDate);
+            if (daysFromNow < 0) {
+                dueNode.classList.add("overdue");
+            } else if (daysFromNow <= 1) {
+                dueNode.classList.add("urgent");
+            }
+        } else {
+            dueNode.append(
+                doc.make("span.optional-text.faded", "No due date")
+            );
+        }
+            
+        let toDoNode = doc.make(`.task.${priority}-priority`, [
+            doc.make(".title", task.title),
+            dueNode,
+            buttonComplete
+        ]);
         toDoNode.addEventListener("click", function(event) {
             if (event.target != buttonComplete) {
                 TaskFormController.showEditDialog(task);

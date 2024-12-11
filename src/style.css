@@ -73,6 +73,14 @@ body {
     display: none !important;
 }
 
+.optional-text {
+    display: none !important;
+}
+
+.faded {
+    opacity: 0.6;
+}
+
 button {
     display: block;
     font-family: var(--default-font);
@@ -255,18 +263,28 @@ header .disclaimer {
     padding-left: 1ch;
 
     display: grid;
-    grid-template-columns: auto 9.5rem 4rem;
+    grid-template-columns: auto 6rem 4rem;
     gap: 0.5rem;
 }
 
 #task-list-container .task * {
     line-height: 1.8rem;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 #task-list-container .task .title {
-    overflow: hidden;
-    white-space: nowrap;
     text-overflow: ellipsis;
+}
+
+#task-list-container .task .due-date::first-letter {
+    text-transform: uppercase;
+}
+
+#task-list-container .task .due-date.urgent {
+    text-align: center;
+    background-color: var(--top-priority-color);
+    border-radius: 0.5lh;
 }
 
 #task-list-container .task.top-priority {
@@ -462,4 +480,16 @@ footer a {
 .dialog.low-priority .dialog-head {
     color: var(--text-color);
     background-color: var(--low-priority-color);
+}
+
+/* For larger screens */
+
+@media (min-width: 600px) {
+    .optional-text {
+        display: unset !important;
+    }
+
+    #task-list-container .task {
+        grid-template-columns: auto 8rem 4rem;
+    }
 }
