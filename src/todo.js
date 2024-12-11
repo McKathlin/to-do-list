@@ -4,6 +4,7 @@
 // Defines to-do items, projects, and priorities
 //=============================================================================
 import autosave from "./lib/autosave.js";
+import dateDiffs from "./lib/dateDiffs.js";
 
 const todo = (function() {
     //=========================================================================
@@ -240,9 +241,11 @@ const todo = (function() {
         }
 
         get actionTasks() {
-            // All non-complete tasks, sorted by priority
+            // Non-complete tasks are returned,
+            // sorted primarily by priority, secondarily by due date
             return this._tasks.filter(item => !item.isComplete())
-                .sort((a, b) => a.priority - b.priority);
+                .sort((a, b) => a.priority - b.priority || 
+                    dateDiffs.dayDiff(a.dueDate, b.dueDate));
         }
 
         get completedTasks() {
