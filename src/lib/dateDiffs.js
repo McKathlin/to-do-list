@@ -55,10 +55,16 @@ const dateDiffs = (function() {
     // Day-only calculations
 
     const dayDiff = function(endDate, startDate) {
-        if (!endDate || !startDate) {
-            return null;
+        console.log("Comparing", endDate, startDate);
+        if (endDate && startDate) {
+            return (stripTime(endDate) - stripTime(startDate)) / TICKS_PER_DAY;
+        } else if (endDate) {
+            return -Infinity; // No start date.
+        } else if (startDate) {
+            return Infinity; // No end date.
+        } else {
+            return 0;
         }
-        return (stripTime(endDate) - stripTime(startDate)) / TICKS_PER_DAY;
     };
 
     const daysFromToday = function(aDate) {
