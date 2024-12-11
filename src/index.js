@@ -113,8 +113,8 @@ const MainPageController = (function() {
             "Due " + dateDiffs.daysFromTodayString(task.dueDate) :
             "No due date";
         const toDoNode = doc.make(`.task.${priority}-priority`, [
-            doc.div(task.title),
-            doc.div(duePhrase),
+            doc.make(".title", task.title),
+            doc.make(".due-date", duePhrase),
             buttonComplete,
         ]);
 
