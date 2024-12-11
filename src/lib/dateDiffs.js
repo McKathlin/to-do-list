@@ -102,6 +102,8 @@ const dateDiffs = (function() {
             // It's in the future
             if (days > 7) {
                 return `in ${days} days`;
+            } else if (days == 0) {
+                return "today";
             } else if (days == 1) {
                 return "tomorrow";
             } else {
