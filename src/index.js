@@ -407,6 +407,8 @@ const TaskFormController = (function() {
         taskForm.classList.remove("create");
         taskForm.classList.add("edit");
         formHeading.innerText = "Edit Task";
+        _setPriorityClass(task.priorityWord);
+
         titleInput.value = task.title;
         descriptionInput.value = task.description;
         priorityInput.value = task.priority;
@@ -417,9 +419,10 @@ const TaskFormController = (function() {
     };
 
     const hideDialog = function() {
-        _currentTask = null;
         taskDialog.classList.add("hidden");
+        _removePriorityClasses();
         endDeleteMode();
+        _currentTask = null;
     };
 
     const startDeleteMode = function() {
@@ -450,6 +453,31 @@ const TaskFormController = (function() {
     const deleteTask = function(task) {
         todo.currentProject.removeTask(task);
         MainPageController.refresh();
+    };
+
+    // Helper methods
+
+    const PRIORITY_SUFFIX = "-priority";
+
+    const _removePriorityClasses = function() {
+        // Find classes to remove
+        let oldClassNames = [];
+        for (const className of taskForm.classList.values()) {
+            if (className.endsWith(PRIORITY_SUFFIX)) {
+                oldClassNames.push(className);
+            }
+        }
+
+        // Remove the classes
+        for (const className of oldClassNames) {
+            taskForm.classList.remove(className);
+        }
+    }
+
+    const _setPriorityClass = function(priorityWord) {
+        _removePriorityClasses();
+        const myClassName = priorityWord.toLowerCase() + PRIORITY_SUFFIX;
+        taskForm.classList.add(myClassName);
     };
 
     return {

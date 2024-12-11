@@ -221,7 +221,7 @@ header .disclaimer {
     background-color: var(--container-back-color);
 }
 
-#task-list-section h3 {
+#task-list-section .section-title {
     text-align: center;
     margin: 0.3rem auto;
     background-color: var(--shadow-color);
@@ -434,14 +434,26 @@ footer a {
     }
 }
 
-.dialog.create {
-    .actions-dropdown {
-        display: none;
-    }
+.dialog.create .actions-dropdown {
+    display: none;
 }
 
-.dialog.edit {
-    .dialog-head {
-        background-color: var(--back-color);
-    }
+.dialog.top-priority .dialog-head {
+    color: var(--strong-text-color);
+    background-color: var(--top-priority-color);
+}
+
+.dialog.high-priority .dialog-head {
+    color: var(--strong-text-color);
+    background-color: var(--high-priority-color);
+}
+
+.dialog.medium-priority .dialog-head {
+    color: var(--text-color);
+    background-color: var(--medium-priority-color);
+}
+
+.dialog.low-priority .dialog-head {
+    color: var(--text-color);
+    background-color: var(--low-priority-color);
 }
