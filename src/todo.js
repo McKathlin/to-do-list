@@ -344,6 +344,7 @@ const todo = (function() {
                 this._projectPreviews = [];
             }
 
+            this.onProjectChanged = this._onProjectChanged.bind(this);
             this._currentProject = null;
             if (0 == this._projectPreviews.length) {
                 this._currentProject = this.addDefaultProject();
@@ -447,7 +448,16 @@ const todo = (function() {
         }
 
         setProject(proj) {
+            // Unset from the old project
+            if (this._currentProject) {
+                this._currentProject.unsubscribe(this.onProjectChanged);
+            }
+
+            // Set to the new project
             this._currentProject = this.getProject(proj);
+            if (this._currentProject) {
+                this._currentProject.subscribe(this.onProjectChanged);
+            }
             this.notifyChanged({ propertyName: "currentProject" });
             return this._currentProject;
         }
@@ -482,12 +492,25 @@ const todo = (function() {
                 }
             }
         }
+
+        // Private helper methods
+
+        _onProjectChanged(event) {
+            if (event.propertyName == "name") {
+                const changedProject = event.sender;
+                const projectPreview = this._projectPreviews.find(
+                    (p) => p.id == changedProject.id);
+                if (projectPreview) {
+                    projectPreview.name = changedProject.name;
+                }
+            }
+        }
     }
 
     autosave.registerType(Workspace.prototype);
 
     //=========================================================================
-    // Module returns
+    // Singleton setup
     //=========================================================================
 
     let todoSpace = autosave.load("Workspace", "only");
