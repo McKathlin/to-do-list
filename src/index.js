@@ -23,6 +23,8 @@ const MainPageController = (function() {
     const taskListContainerNode =
         document.getElementById("task-list-container");
 
+    const completedTasksSection =
+        document.getElementById("completed-task-section");
     const completedListContainerNode =
         document.getElementById("completed-list-container");
 
@@ -142,18 +144,36 @@ const MainPageController = (function() {
     };
 
     const _renderCompletedTasks = function(task) {
-        completedListContainerNode.replaceChildren();
         if (!todo.currentProject) {
+            completedTasksSection.classList.add("hidden");
             return;
         }
-        for (const task of todo.currentProject.completedTasks) {
+        const completedTasks = todo.currentProject.completedTasks;
+
+        if (completedTasks.length == 0) {
+            completedTasksSection.classList.add("hidden");
+            return;
+        }
+
+        completedTasksSection.classList.remove("hidden");
+        completedListContainerNode.replaceChildren();
+        for (const task of completedTasks) {
             completedListContainerNode.appendChild(_makeCompletedNode(task));
         }
     };
 
     const _makeCompletedNode = function(task) {
-        const taskNode = doc.make(".completed-task", [
-            doc.p(task.title)
+        const editButton = doc.make("button.edit-completed-task", "Edit");
+        editButton.addEventListener("click", function(event) {
+            TaskFormController.showEditDialog(task);
+        });
+
+        const taskNode = doc.make("tr.completed-task", [
+            doc.td(task.title),
+            doc.td(task.completionDate?.toDateString()),
+            doc.td([
+                editButton,
+            ]),
         ]);
         return taskNode;
     };

@@ -343,9 +343,49 @@ button#new-task-show-button {
     margin: 1rem;
 }
 
-#completed-list-container {
-    width: var(--max-reading-width);
+#completed-task-section table.task-table {
+    max-width: var(--max-reading-width);
     margin: auto;
+    border-collapse: collapse;
+
+    th, td {
+        font-weight: normal;
+        text-align: left;
+        line-height: 1.2rem;
+        padding: 0 0.5rem;
+    }
+
+    th {
+        font-style: italic;
+        opacity: 0.6;
+        padding-bottom: 0.5rem;
+    }
+
+    tbody tr {
+        border-top: 1px solid var(--container-back-color);
+    }
+
+    tbody tr:hover {
+        background-color: var(--container-back-color);
+    }
+
+    col.title {
+        min-width: 12rem;
+    }
+
+    col.completion-date {
+        width: 10rem;
+    }
+
+    col.actions {
+        width: 5rem;
+    }
+
+    button {
+        background-color: var(--back-color);
+        margin: 1px;
+        width: 100%;
+    }
 }
 
 /* Footer */
