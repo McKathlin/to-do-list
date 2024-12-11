@@ -338,9 +338,12 @@ button#new-task-show-button {
 
 /* Completed Tasks Section */
 
-#completed-task-section h3 {
+#completed-task-section .section-title {
     text-align: center;
-    margin: 1rem;
+    margin: 1rem auto;
+    width: 16ch;
+    line-height: 2rem;
+    border-bottom: 2px solid var(--container-back-color);
 }
 
 #completed-task-section table.task-table {
