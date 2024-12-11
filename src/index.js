@@ -72,7 +72,7 @@ const MainPageController = (function() {
 
     const _makeProjectNode = function(projectPreview) {
         let button = doc.make("button.project", projectPreview.name);
-        if (projectPreview.id == todo.currentProject.id) {
+        if (todo.currentProject && projectPreview.id == todo.currentProject.id) {
             button.classList.add("current");
         } else {
             button.classList.add("other");
@@ -84,12 +84,18 @@ const MainPageController = (function() {
     };
 
     const _renderCurrentProjectInfo = function() {
+        if (!todo.currentProject) {
+            return;
+        }
         let project = todo.currentProject;
         projectNameNode.innerText = project.name;
         projectDescriptionNode.innerText = project.description;
     };
 
     const _renderToDoList = function() {
+        if (!todo.currentProject) {
+            return;
+        }
         taskListContainerNode.replaceChildren();
         for (const task of todo.currentProject.actionTasks) {
             taskListContainerNode.appendChild(_makeToDoNode(task));
@@ -122,6 +128,9 @@ const MainPageController = (function() {
 
     const _renderCompletedTasks = function(task) {
         completedListContainerNode.replaceChildren();
+        if (!todo.currentProject) {
+            return;
+        }
         for (const task of todo.currentProject.completedTasks) {
             completedListContainerNode.appendChild(_makeCompletedNode(task));
         }
@@ -228,6 +237,7 @@ const ProjectFormController = (function() {
 
     confirmDeleteButton.addEventListener("click", function(event) {
         deleteProject(_currentProject);
+        hideDialog();
     })
 
     const startDeleteMode = function() {
