@@ -8,12 +8,6 @@ import dateDiffs from "./lib/dateDiffs.js";
 
 const todo = (function() {
     //=========================================================================
-    // Private variables
-    //=========================================================================
-    let _nextProjectId = 1;
-    let _nextTaskId = 100;
-
-    //=========================================================================
     // Priority
     //=========================================================================
 
@@ -37,7 +31,7 @@ const todo = (function() {
 
     class Task extends autosave.AutosavingObservable {
         constructor(data) {
-            super(data.id ?? _nextTaskId);
+            super(data.id);
 
             this._title = data.title;
             this._description = data.description ?? "";
@@ -46,11 +40,8 @@ const todo = (function() {
             this._priority = data.priority ?? Priority.MEDIUM;
 
             if (data.id === undefined) {
-                _nextTaskId++;
                 this.onCreate();
-            } else {
-                _nextTaskId = Math.max(_nextTaskId, this.id) + 1;
-            }
+            } 
         }
 
         // Storable implementation
@@ -163,11 +154,9 @@ const todo = (function() {
     // Holds a list of related tasks
     //=========================================================================
 
-    // Init
-
     class Project extends autosave.AutosavingObservable {
         constructor(data) {
-            super(data.id ?? _nextProjectId);
+            super(data.id);
 
             this._name = data.name;
             this._description = data.description ?? "";
@@ -179,12 +168,7 @@ const todo = (function() {
             }
 
             if (data.id === undefined) {
-                // We're loading an existing project.
-                _nextProjectId++;
                 this.onCreate();
-            } else {
-                // It's a new project.
-                _nextProjectId = Math.max(this._id, _nextProjectId) + 1;
             }
         }
 
@@ -325,11 +309,9 @@ const todo = (function() {
     // Manages a list of projects
     //=========================================================================
 
-    const WORKSPACE_ID = "only";
-
     class Workspace extends autosave.AutosavingObservable {
         constructor(data = {}) {
-            super(WORKSPACE_ID);
+            super(data.id);
 
             if (data.projectPreviews) {
                 this._projectPreviews = data.projectPreviews.slice();
@@ -361,6 +343,7 @@ const todo = (function() {
 
         pack() {
             let data = {
+                id: this.id,
                 projectPreviews: this.projectPreviews,
                 currentProjectId: this.currentProjectId,
             };
@@ -524,7 +507,7 @@ const todo = (function() {
     // Singleton setup
     //=========================================================================
 
-    let todoSpace = autosave.load("Workspace", WORKSPACE_ID);
+    let todoSpace = autosave.load("Workspace", autosave.FIRST_ID);
     if (!todoSpace) {
         todoSpace = new Workspace();
     }

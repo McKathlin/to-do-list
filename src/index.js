@@ -533,5 +533,4 @@ const TaskFormController = (function() {
     };
 })();
 
-console.log(todo);
 MainPageController.refresh();
