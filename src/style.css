@@ -144,6 +144,8 @@ header h1 {
     font-size: 3rem;
     font-weight: 400;
     font-style: normal;
+    
+    text-shadow: -1px 3px var(--dimmer-color);
     transform: scale(1.2, 1);
     color: var(--header-text-color);
     margin: auto;
