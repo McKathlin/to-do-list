@@ -296,6 +296,7 @@ const ProjectFormController = (function() {
     };
 
     const hideDialog = function() {
+        endDeleteMode();
         projectDialog.classList.add("hidden");
     };
 
