@@ -4,7 +4,6 @@
 // Defines to-do items, projects, and priorities
 //=============================================================================
 import autosave from "./lib/autosave.js";
-localStorage.clear();
 
 const todo = (function() {
     //=========================================================================
