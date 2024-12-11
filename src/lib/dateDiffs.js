@@ -15,6 +15,9 @@ const dateDiffs = (function() {
     const TICKS_PER_HOUR = TICKS_PER_MINUTE * MINUTES_PER_HOUR;
     const TICKS_PER_DAY = TICKS_PER_HOUR * HOURS_PER_DAY;
 
+    const DAY_NAMES = ["Sunday", "Monday", "Tuesday",
+        "Wednesday", "Thursday", "Friday", "Saturday"];
+
     // Variables and properties
 
     // _eodHours = hours from midnight to end of work day
@@ -67,6 +70,13 @@ const dateDiffs = (function() {
         }
     };
 
+    const dayOfWeekString = function(aDate) {
+        if (!aDate) {
+            return null;
+        }
+        return DAY_NAMES[aDate.getDay()];
+    };
+
     const daysFromToday = function(aDate) {
         if (!aDate) {
             return null;
@@ -79,19 +89,25 @@ const dateDiffs = (function() {
         if (!aDate) {
             return null;
         }
+
         const days = daysFromToday(aDate);
-        if (0 == days) {
-            return "today";
-        } else if (1 == days) {
-            return "tomorrow";
-        } else if (-1 == days) {
-            return "yesterday";
-        } else if (days < 0) {
+        if (days < 0) {
             // It's in the past
-            return `${-days} days ago`;
+            if (-1 == days) {
+                return "yesterday";
+            } else {
+                return `${-days} days ago`;
+            }
         } else {
             // It's in the future
-            return `in ${days} days`;
+            if (days > 7) {
+                return `in ${days} days`;
+            } else if (days == 1) {
+                return "tomorrow";
+            } else {
+                // It's less than a week away
+                return dayOfWeekString(aDate);
+            }
         }
     };
 
