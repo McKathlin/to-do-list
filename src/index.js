@@ -156,6 +156,9 @@ const ProjectFormController = (function() {
         document.getElementById("project-dialog");
     const projectForm =
         document.getElementById("project-form");
+    const formHeading =
+        document.getElementById("project-form-heading");
+
     const nameInput =
         document.getElementById("project-name");
     const descriptionInput = 
@@ -237,15 +240,27 @@ const ProjectFormController = (function() {
 
     const showCreateDialog = function() {
         _currentProject = null;
+
+        projectForm.classList.remove("edit");
+        projectForm.classList.add("create");
+        formHeading.innerText = "Create Project";
+
         nameInput.value = "";
         descriptionInput.value = "";
+
         projectDialog.classList.remove("hidden");
     };
 
     const showEditDialog = function(project) {
         _currentProject = project;
+
+        projectForm.classList.remove("create");
+        projectForm.classList.add("edit");
+        formHeading.innerText = "Edit Project";
+
         nameInput.value = project.name;
         descriptionInput.value = project.description;
+
         projectDialog.classList.remove("hidden");
     };
 
