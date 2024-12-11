@@ -15,8 +15,12 @@ const dateDiffs = (function() {
     const TICKS_PER_HOUR = TICKS_PER_MINUTE * MINUTES_PER_HOUR;
     const TICKS_PER_DAY = TICKS_PER_HOUR * HOURS_PER_DAY;
 
+    const DAYS_PER_WEEK = 7;
+    const BUSINESS_DAYS_PER_WEEK = 5;
     const DAY_NAMES = ["Sunday", "Monday", "Tuesday",
         "Wednesday", "Thursday", "Friday", "Saturday"];
+    const IS_BUSINESS_DAY = [false, true, true,
+        true, true, true, false];
 
     // Variables and properties
 
@@ -58,7 +62,6 @@ const dateDiffs = (function() {
     // Day-only calculations
 
     const dayDiff = function(endDate, startDate) {
-        console.log("Comparing", endDate, startDate);
         if (endDate && startDate) {
             return (stripTime(endDate) - stripTime(startDate)) / TICKS_PER_DAY;
         } else if (endDate) {
@@ -78,9 +81,6 @@ const dateDiffs = (function() {
     };
 
     const daysFromToday = function(aDate) {
-        if (!aDate) {
-            return null;
-        }
         const now = new Date();
         return dayDiff(aDate, now);
     };
@@ -114,6 +114,34 @@ const dateDiffs = (function() {
     const today = function() {
         let now = new Date();
         return stripTime(now);
+    };
+
+    // Business day calculations
+
+    const businessDayDiff = function(endDate, startDate) {
+        const daysApart = dayDiff(endDate, startDate);
+        if (!Number.isFinite(daysApart)) {
+            // Don't try to calculate infinite business days.
+            return daysApart;
+        }
+        const weeks = Math.floor(daysApart / DAYS_PER_WEEK);
+        let remainder = daysApart - (weeks * DAYS_PER_WEEK);
+        if (endDate.getDay() < startDate.getDay()) {
+            // The remainder spans a weekend,
+            // so subtract the days of the weekend.
+            remainder = Math.max(0,
+                remainder - (DAYS_PER_WEEK - BUSINESS_DAYS_PER_WEEK));
+        }
+        return (weeks * BUSINESS_DAYS_PER_WEEK) + remainder;
+    };
+
+    const businessDaysFromToday = function(aDate) {
+        const now = new Date();
+        return businessDayDiff(aDate, now);
+    };
+
+    const isBusinessDay = function(aDate) {
+        return IS_BUSINESS_DAY[aDate.getDay()];
     };
 
     // Date input conversions
@@ -165,6 +193,7 @@ const dateDiffs = (function() {
     let myModule = {
         addOffset, stripTime,
         dayDiff, daysFromToday, daysFromTodayString, today,
+        businessDayDiff, businessDaysFromToday, isBusinessDay,
         toInputDateString, inputToUTC, inputToLocal, inputToLocalEOD,
     };
 
