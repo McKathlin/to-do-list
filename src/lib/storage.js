@@ -47,7 +47,7 @@ const storage = (function() {
     };
 
     const load = function(typeName, id) {
-        const json = localStorage.getItem(_makeKey(typeName, id));
+        const json = loadPrimitive(_makeKey(typeName, id));
         if (!json) {
             return null; // Nothing to load.
         }
@@ -63,6 +63,10 @@ const storage = (function() {
         
     };
 
+    const loadPrimitive = function(key) {
+        return localStorage.getItem(key);
+    };
+
     const save = function(storable) {
         if (!storable) {
             throw new Error("Can't save non-storable", storable);
@@ -70,12 +74,16 @@ const storage = (function() {
 
         try {
             const key = _makeKey(storable.typeName, storable.id);
-            localStorage.setItem(key, JSON.stringify(storable.pack()));
+            savePrimitive(key, JSON.stringify(storable.pack()));
             return true;
         } catch (err) {
             console.error("Saving failed!", err);
             return false;
         }
+    };
+
+    const savePrimitive = function(key, value) {
+        localStorage.setItem(key, value);
     };
 
     const wipe = function(storable) {
@@ -85,10 +93,14 @@ const storage = (function() {
 
         try {
             const key = _makeKey(storable.typeName, storable.id);
-            localStorage.removeItem(key);
+            wipePrimitive(key);
         } catch (err) {
             console.error("Wiping failed!", err);
         }
+    };
+
+    const wipePrimitive = function(key) {
+        localStorage.removeItem(key);
     };
 
     // Private helpers
@@ -100,8 +112,11 @@ const storage = (function() {
     // Module returns
 
     return {
-        registerType, isStorable, load, save, wipe
-    }
+        registerType, isStorable,
+        load, loadPrimitive,
+        save, savePrimitive,
+        wipe, wipePrimitive,
+    };
 })();
 
 export default storage;
