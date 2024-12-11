@@ -284,6 +284,14 @@ const ProjectFormController = (function() {
     const showEditDialog = function(project) {
         _currentProject = project;
 
+        if (1 == todo.projectCount) {
+            // Can't delete only project.
+            startDeleteButton.disabled = true;
+            startDeleteButton.innerText = "Can't Delete";
+        } else {
+            startDeleteButton.disabled = false;
+            startDeleteButton.innerText = "Delete";
+        }
         projectForm.classList.remove("create");
         projectForm.classList.add("edit");
         formHeading.innerText = "Edit Project";
