@@ -4,6 +4,7 @@
 // Defines to-do items, projects, and priorities
 //=============================================================================
 import autosave from "./lib/autosave.js";
+localStorage.clear();
 
 const todo = (function() {
     //=========================================================================
@@ -37,11 +38,6 @@ const todo = (function() {
     class Task extends autosave.AutosavingObservable {
         constructor(data) {
             super(data.id ?? _nextTaskId);
-
-            if (typeof data == "string") {
-                let title = data;
-                data = { title };
-            }
 
             this._title = data.title;
             this._description = data.description ?? "";
@@ -172,11 +168,6 @@ const todo = (function() {
     class Project extends autosave.AutosavingObservable {
         constructor(data) {
             super(data.id ?? _nextProjectId);
-
-            if (typeof data == "string") {
-                let name = data;
-                data = { name };
-            }
 
             this._name = data.name;
             this._description = data.description ?? "";
@@ -340,6 +331,7 @@ const todo = (function() {
 
             if (data.projectPreviews) {
                 this._projectPreviews = data.projectPreviews.slice();
+                this._removeNullProjectPreviews();
             } else {
                 this._projectPreviews = [];
             }
@@ -403,6 +395,10 @@ const todo = (function() {
             return Priority;
         }
 
+        get projectCount() {
+            return this._projectPreviews.length;
+        }
+
         get projectPreviews() {
             return this._projectPreviews.slice();
         }
@@ -410,7 +406,12 @@ const todo = (function() {
         // Public methods
 
         addProject(name, description = "") {
-            let project = new Project(name, description);
+            // Accept either two strings or a data object
+            let data = { name, description };
+            if (typeof name == "object") {
+                data = name;
+            }
+            let project = new Project(data);
             let projectPreview = { id: project.id, name: project.name };
             this._projectPreviews.push(projectPreview);
             this.notifyChanged({ propertyName: "projectPreviews" });
@@ -418,7 +419,10 @@ const todo = (function() {
         }
 
         addDefaultProject() {
-            let project = this.addProject("Default Project", "");
+            let name = "Default Project";
+            let description = "To change this project's name and description," +
+                " use the Edit button to the right.";
+            let project = this.addProject(name, description);
             project.addTask("Add to-do items");
             return project;
         }
@@ -466,9 +470,6 @@ const todo = (function() {
             // Destroy project
             let project = this.getProject(projHandle);
             if (project) {
-                if (project == this.currentProject) {
-                    this.currentProject = null;
-                }
                 project.destroy();
             }
 
@@ -505,6 +506,15 @@ const todo = (function() {
                 }
             }
         }
+
+        _removeNullProjectPreviews() {
+            const oldCount = this._projectPreviews.length;
+            this._projectPreviews = this._projectPreviews.filter((p) => !!p);
+            if (this._projectPreviews.length < oldCount) {
+                let deleteCount = oldCount - this._projectPreviews.length;
+                console.warn(`Deleted ${deleteCount} null projectPreviews`);
+            }
+        }
     }
 
     autosave.registerType(Workspace.prototype);
@@ -513,7 +523,7 @@ const todo = (function() {
     // Singleton setup
     //=========================================================================
 
-    let todoSpace = autosave.load("Workspace", "only");
+    let todoSpace = autosave.load("Workspace", WORKSPACE_ID);
     if (!todoSpace) {
         todoSpace = new Workspace();
     }

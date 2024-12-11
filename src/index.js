@@ -42,10 +42,14 @@ const MainPageController = (function() {
 
     const refresh = function() {
         _renderCurrentTime();
-        _renderProjects();
-        _renderCurrentProjectInfo();
-        _renderToDoList();
-        _renderCompletedTasks();
+        if (todo.projectCount > 0) {
+            _renderProjects();
+            _renderCurrentProjectInfo();
+            _renderToDoList();
+            _renderCompletedTasks();
+        } else {
+            ProjectFormController.showCreateDialog();
+        }
     };
 
     // Private helper methods
@@ -200,7 +204,7 @@ const ProjectFormController = (function() {
         const props = {
             name: nameInput.value,
             description: descriptionInput.value,
-        }
+        };
 
         if (_currentProject) {
             editProject(_currentProject, props);
@@ -244,6 +248,7 @@ const ProjectFormController = (function() {
         projectForm.classList.remove("edit");
         projectForm.classList.add("create");
         formHeading.innerText = "Create Project";
+        submitButton.innerText = "Create";
 
         nameInput.value = "";
         descriptionInput.value = "";
@@ -257,6 +262,7 @@ const ProjectFormController = (function() {
         projectForm.classList.remove("create");
         projectForm.classList.add("edit");
         formHeading.innerText = "Edit Project";
+        submitButton.innerText = "Save";
 
         nameInput.value = project.name;
         descriptionInput.value = project.description;
@@ -268,8 +274,8 @@ const ProjectFormController = (function() {
         projectDialog.classList.add("hidden");
     };
 
-    const addProject = function(properties) {
-        let project = todo.addProject(properties);
+    const addProject = function(name, description) {
+        let project = todo.addProject(name, description);
         MainPageController.setProject(project);
     };
 
@@ -391,12 +397,14 @@ const TaskFormController = (function() {
 
         taskForm.classList.remove("edit");
         taskForm.classList.add("create");
+        _removePriorityClasses();
+
         formHeading.innerText = "Create Task";
+        submitButton.innerText = "Create";
         titleInput.value = "";
         descriptionInput.value = "";
         priorityInput.value = todo.priority.MEDIUM;
         dueDateInput.value = null;
-        submitButton.innerText = "Create";
 
         taskDialog.classList.remove("hidden");
     };
@@ -406,21 +414,22 @@ const TaskFormController = (function() {
 
         taskForm.classList.remove("create");
         taskForm.classList.add("edit");
-        formHeading.innerText = "Edit Task";
         _setPriorityClass(task.priorityWord);
+
+        formHeading.innerText = "Edit Task";
+        submitButton.innerText = "Save";
 
         titleInput.value = task.title;
         descriptionInput.value = task.description;
         priorityInput.value = task.priority;
         dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
-        submitButton.innerText = "Save";
+        
 
         taskDialog.classList.remove("hidden");
     };
 
     const hideDialog = function() {
         taskDialog.classList.add("hidden");
-        _removePriorityClasses();
         endDeleteMode();
         _currentTask = null;
     };
@@ -490,4 +499,5 @@ const TaskFormController = (function() {
     };
 })();
 
+console.log(todo);
 MainPageController.refresh();
