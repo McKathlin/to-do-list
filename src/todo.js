@@ -79,6 +79,59 @@ const todo = (function() {
             return data;
         }
 
+        // Public properties
+
+        get completionDate() { 
+            return this._completionDate;
+        }
+        set completionDate(d) {
+            this._completionDate = this._parseNullableDate(d);
+            this.notifyChanged({ propertyName: "completionDate" });
+        }
+
+        get description() {
+            return this._description;
+        }
+        set description(str) {
+            this._description = str;
+            this.notifyChanged({ propertyName: "description" });
+        }
+
+        get dueDate() {
+            return this._dueDate;
+        }
+        set dueDate(d) {
+            this._dueDate = this._parseNullableDate(d);
+            this.notifyChanged({ propertyName: "dueDate" });
+        }
+
+        get priority() {
+            return this._priority;
+        }
+        set priority(p) {
+            if (!Object.values(Priority).includes(p)) {
+                throw new Error("Unrecognized priority:", p);
+            } else {
+                this._priority = p;
+                this.notifyChanged({ propertyName: "priority" });
+            }
+        }
+
+        get priorityWord() {
+            return PriorityWord[this._priority];
+        }
+
+        get title() {
+            return this._title;
+        }
+        set title(str) {
+            if (!str || 0 == str.length) {
+                throw new Error("Title cannot be blank");
+            }
+            this._title = str;
+            this.notifyChanged({ propertyName: "title" });
+        }
+
         // Public methods
 
         isComplete() {
@@ -109,69 +162,6 @@ const todo = (function() {
 
     autosave.registerType(Task.prototype);
 
-    // Properties
-
-    // !!! Put properties in class
-    Object.defineProperties(Task.prototype, {
-        completionDate: {
-            get: function() { 
-                return this._completionDate;
-            },
-            set: function(d) {
-                this._completionDate = this._parseNullableDate(d);
-                this.notifyChanged({ propertyName: "completionDate" });
-            },
-        },
-        description: {
-            get: function() {
-                return this._description;
-            },
-            set: function(str) {
-                this._description = str;
-                this.notifyChanged({ propertyName: "description" });
-            },
-        },
-        dueDate: {
-            get: function() {
-                return this._dueDate;
-            },
-            set: function(d) {
-                this._dueDate = this._parseNullableDate(d);
-                this.notifyChanged({ propertyName: "dueDate" });
-            },
-        },
-        priority: {
-            get: function() {
-                return this._priority;
-            },
-            set: function(p) {
-                if (!Object.values(Priority).includes(p)) {
-                    throw new Error("Unrecognized priority:", p);
-                } else {
-                    this._priority = p;
-                    this.notifyChanged({ propertyName: "priority" });
-                }
-            },
-        },
-        priorityWord: {
-            get: function() {
-                return PriorityWord[this._priority];
-            },
-        },
-        title: {
-            get: function() {
-                return this._title;
-            },
-            set: function(str) {
-                if (!str || 0 == str.length) {
-                    throw new Error("Title cannot be blank");
-                }
-                this._title = str;
-                this.notifyChanged({ propertyName: "title" });
-            },
-        },
-    });
-    
     //=========================================================================
     // Project
     // Holds a list of related tasks
@@ -209,6 +199,10 @@ const todo = (function() {
 
         // Storable implementation
 
+        get typeName() {
+            return "Project";
+        }
+
         unpack(data) {
             return new Project(data);
         }
@@ -228,6 +222,43 @@ const todo = (function() {
                 task.destroy();
             }
             super.destroy();
+        }
+
+        // Properties
+
+        get name() {
+            return this._name;
+        }
+        set name(str) {
+            if (!str || 0 == str.length) {
+                throw new Error("Project name cannot be empty");
+            }
+            this._name = str;
+            this.notifyChanged({ propertyName: "name" });
+        }
+
+        get description() {
+            return this._description;
+        }
+        set description(str) {
+            this._description = str;
+            this.notifyChanged({ propertyName: "description" });
+        }
+
+        get allTasks() {
+            return this._tasks.slice();
+        }
+
+        get actionTasks() {
+            // All non-complete tasks, sorted by priority
+            return this._tasks.filter(item => !item.isComplete())
+                .sort((a, b) => a.priority - b.priority);
+        }
+
+        get completedTasks() {
+            // All completed tasks, most recently completed first
+            return this._tasks.filter(item => item.isComplete())
+                .sort((a, b) => b.completionDate - a.completionDate);
         }
 
         // Public methods
@@ -294,61 +325,7 @@ const todo = (function() {
         }
     }
 
-    // !!! add properties to Project class
-
-    // Storable implementation
-
-    Object.defineProperty(Project.prototype, "typeName", {
-        value: "Project",
-        writable: false,
-    });
-
     autosave.registerType(Project.prototype);
-
-    // Properties
-
-    Object.defineProperties(Project.prototype, {
-        name: {
-            get: function() {
-                return this._name;
-            },
-            set: function(str) {
-                if (!str || 0 == str.length) {
-                    throw new Error("Project name cannot be empty");
-                }
-                this._name = str;
-                this.notifyChanged({ propertyName: "name" });
-            },
-        },
-        description: {
-            get: function() {
-                return this._description;
-            },
-            set: function(str) {
-                this._description = str;
-                this.notifyChanged({ propertyName: "description" });
-            },
-        },
-        allTasks: {
-            get: function() {
-                return this._tasks.slice();
-            },
-        },
-        actionTasks: {
-            get: function() {
-                // All non-complete tasks, sorted by priority
-                return this._tasks.filter(item => !item.isComplete())
-                    .sort((a, b) => a.priority - b.priority);
-            },
-        },
-        completedTasks: {
-            get: function() {
-                // All completed tasks, most recently completed first
-                return this._tasks.filter(item => item.isComplete())
-                    .sort((a, b) => b.completionDate - a.completionDate);
-            },
-        },
-    });
 
     //=========================================================================
     // Workspace
@@ -406,6 +383,30 @@ const todo = (function() {
             }
             super.destroy();
         }
+
+        // Public properties
+
+        get currentProject() {
+            return this._currentProject;
+        }
+
+        get currentProjectId() {
+            if (this._currentProject) {
+                return this._currentProject.id;
+            } else {
+                return null;
+            }
+        }
+
+        get priority() {
+            return Priority;
+        }
+
+        get projectPreviews() {
+            return this._projectPreviews.slice();
+        }
+
+        // Public methods
 
         addProject(name, description = "") {
             let project = new Project(name, description);
@@ -484,43 +485,6 @@ const todo = (function() {
     }
 
     autosave.registerType(Workspace.prototype);
-
-    // !!! add properties to Workspace class
-
-    // Storable interface
-
-    Object.defineProperty(Workspace.prototype, "typeName", {
-        value: "Workspace",
-        writable: false,
-    });
-
-    // Public properties
-
-    Object.defineProperties(Workspace.prototype, {
-        currentProject: {
-            get: function() {
-                return this._currentProject;
-            },
-        },
-        currentProjectId: {
-            get: function() {
-                if (this._currentProject) {
-                    return this._currentProject.id;
-                } else {
-                    return null;
-                }
-            },
-        },
-        priority: {
-            value: Priority,
-            writable: false,
-        },
-        projectPreviews: {
-            get: function() {
-                return this._projectPreviews.slice();
-            }
-        },
-    });
 
     //=========================================================================
     // Module returns
