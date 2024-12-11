@@ -29,7 +29,8 @@ body {
     --low-priority-color: var(--back-color);
 
     --create-color: #26d6b0;
-    --danger-color: var(--top-priority-color);
+    --danger-back-color: #c72914;
+    --danger-text-color: #ffffef;
 
     --container-shadow: inset 1px 2px 4px 2px var(--shadow-color);
     --item-shadow: 2px 2px 1px var(--shadow-color);
@@ -267,26 +268,6 @@ header .disclaimer {
     gap: 0.5rem;
 }
 
-#task-list-container .task * {
-    line-height: 1.8rem;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-#task-list-container .task .title {
-    text-overflow: ellipsis;
-}
-
-#task-list-container .task .due-date::first-letter {
-    text-transform: uppercase;
-}
-
-#task-list-container .task .due-date.urgent {
-    text-align: center;
-    background-color: var(--top-priority-color);
-    border-radius: 0.5lh;
-}
-
 #task-list-container .task.top-priority {
     color: var(--strong-text-color);
     background-color: var(--top-priority-color);
@@ -305,6 +286,33 @@ header .disclaimer {
 #task-list-container .task.low-priority {
     color: var(--text-color);
     background-color: var(--low-priority-color);
+}
+
+#task-list-container .task * {
+    line-height: 1.8rem;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+#task-list-container .task .title {
+    text-overflow: ellipsis;
+}
+
+#task-list-container .task .due-date::first-letter {
+    text-transform: uppercase;
+}
+
+#task-list-container .task .due-date.urgent {
+    background-color: var(--top-priority-color);
+    text-align: center;
+    border-radius: 0.5lh;
+}
+
+#task-list-container .task.top-priority .due-date.urgent {
+    color: var(--danger-text-color);
+    background-color: var(--danger-back-color);
+    text-align: center;
+    border-radius: 0.5lh;
 }
 
 #task-list-container .task button.complete-button {
@@ -454,7 +462,8 @@ footer a {
     }
 
     button.delete {
-        background-color: var(--danger-color);
+        color: var(--danger-text-color);
+        background-color: var(--danger-back-color);
     }
 }
 
