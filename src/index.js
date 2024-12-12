@@ -8,549 +8,514 @@ import todo from "./todo.js";
 // Main Page Controller
 //=============================================================================
 
-const MainPageController = (function() {
-    // Nodes
+const MainPageController = (function () {
+  // Nodes
 
-    const currentTimeNode = document.getElementById("current-time");
+  const currentTimeNode = document.getElementById("current-time");
 
-    const projectListNode = document.getElementById("project-list");
+  const projectListNode = document.getElementById("project-list");
 
-    const projectNameNode =
-        document.getElementById("current-project-name");
-    const projectDescriptionNode =
-        document.getElementById("current-project-description");
+  const projectNameNode = document.getElementById("current-project-name");
+  const projectDescriptionNode = document.getElementById(
+    "current-project-description",
+  );
 
-    const taskListContainerNode =
-        document.getElementById("task-list-container");
+  const taskListContainerNode = document.getElementById("task-list-container");
 
-    const completedTasksSection =
-        document.getElementById("completed-task-section");
-    const completedListContainerNode =
-        document.getElementById("completed-list-container");
+  const completedTasksSection = document.getElementById(
+    "completed-task-section",
+  );
+  const completedListContainerNode = document.getElementById(
+    "completed-list-container",
+  );
 
-    // Public methods
+  // Public methods
 
-    const markComplete = function(task) {
-        console.log(`${task.title} complete!`);
-        task.markComplete();
-        refresh();
-    };
+  const markComplete = function (task) {
+    console.log(`${task.title} complete!`);
+    task.markComplete();
+    refresh();
+  };
 
-    const setProject = function(projectPreview) {
-        console.log(`Switching to ${projectPreview.name}`);
-        todo.setProject(projectPreview);
-        refresh();
-    };
+  const setProject = function (projectPreview) {
+    console.log(`Switching to ${projectPreview.name}`);
+    todo.setProject(projectPreview);
+    refresh();
+  };
 
-    const refresh = function() {
-        _renderCurrentTime();
-        if (todo.projectCount > 0) {
-            _renderProjects();
-            _renderCurrentProjectInfo();
-            _renderToDoList();
-            _renderCompletedTasks();
-        } else {
-            ProjectFormController.showCreateDialog();
-        }
-    };
+  const refresh = function () {
+    _renderCurrentTime();
+    if (todo.projectCount > 0) {
+      _renderProjects();
+      _renderCurrentProjectInfo();
+      _renderToDoList();
+      _renderCompletedTasks();
+    } else {
+      ProjectFormController.showCreateDialog();
+    }
+  };
 
-    // Private helper methods
+  // Private helper methods
 
-    const _renderCurrentTime = function() {
-        if (!currentTimeNode) {
-            return;
-        }
-        let timeStr = new Date().toString();
-        currentTimeNode.innerText = timeStr;
-    };
+  const _renderCurrentTime = function () {
+    if (!currentTimeNode) {
+      return;
+    }
+    let timeStr = new Date().toString();
+    currentTimeNode.innerText = timeStr;
+  };
 
-    const _renderProjects = function() {
-        projectListNode.replaceChildren();
-        for (const preview of todo.projectPreviews) {
-            let projectNode = _makeProjectNode(preview);
-            projectListNode.appendChild(projectNode);
-        }
-    };
+  const _renderProjects = function () {
+    projectListNode.replaceChildren();
+    for (const preview of todo.projectPreviews) {
+      let projectNode = _makeProjectNode(preview);
+      projectListNode.appendChild(projectNode);
+    }
+  };
 
-    const _makeProjectNode = function(projectPreview) {
-        let button = doc.make("button.project", projectPreview.name);
-        if (todo.currentProject && projectPreview.id == todo.currentProject.id) {
-            button.classList.add("current");
-        } else {
-            button.classList.add("other");
-        }
-        button.addEventListener("click", function() {
-            setProject(projectPreview);
-        });
-        return button;
-    };
+  const _makeProjectNode = function (projectPreview) {
+    let button = doc.make("button.project", projectPreview.name);
+    if (todo.currentProject && projectPreview.id == todo.currentProject.id) {
+      button.classList.add("current");
+    } else {
+      button.classList.add("other");
+    }
+    button.addEventListener("click", function () {
+      setProject(projectPreview);
+    });
+    return button;
+  };
 
-    const _renderCurrentProjectInfo = function() {
-        if (!todo.currentProject) {
-            return;
-        }
-        let project = todo.currentProject;
-        projectNameNode.innerText = project.name;
-        projectDescriptionNode.innerText = project.description;
-    };
+  const _renderCurrentProjectInfo = function () {
+    if (!todo.currentProject) {
+      return;
+    }
+    let project = todo.currentProject;
+    projectNameNode.innerText = project.name;
+    projectDescriptionNode.innerText = project.description;
+  };
 
-    const _renderToDoList = function() {
-        if (!todo.currentProject) {
-            return;
-        }
-        taskListContainerNode.replaceChildren();
-        for (const task of todo.currentProject.actionTasks) {
-            taskListContainerNode.appendChild(_makeToDoNode(task));
-        }
-    };
+  const _renderToDoList = function () {
+    if (!todo.currentProject) {
+      return;
+    }
+    taskListContainerNode.replaceChildren();
+    for (const task of todo.currentProject.actionTasks) {
+      taskListContainerNode.appendChild(_makeToDoNode(task));
+    }
+  };
 
-    const _makeToDoNode = function(task) {
-        let buttonComplete = doc.make("button.complete-button", "Done");
-        buttonComplete.addEventListener("click", function() {
-            markComplete(task);
-        });
+  const _makeToDoNode = function (task) {
+    let buttonComplete = doc.make("button.complete-button", "Done");
+    buttonComplete.addEventListener("click", function () {
+      markComplete(task);
+    });
 
-        let priority = task.priorityWord.toLowerCase();
-        let dueNode = doc.make(".due-date");
-        if (task.dueDate) {
-            dueNode.append(
-                doc.make("span.optional-text", "due "),
-                doc.span(dateDiffs.daysFromTodayString(task.dueDate))
-            );
+    let priority = task.priorityWord.toLowerCase();
+    let dueNode = doc.make(".due-date");
+    if (task.dueDate) {
+      dueNode.append(
+        doc.make("span.optional-text", "due "),
+        doc.span(dateDiffs.daysFromTodayString(task.dueDate)),
+      );
 
-            let daysFromNow = dateDiffs.businessDaysFromToday(task.dueDate);
-            if (daysFromNow < 0) {
-                dueNode.classList.add("overdue");
-            } else if (daysFromNow <= 1) {
-                dueNode.classList.add("urgent");
-            }
-        } else {
-            dueNode.append(
-                doc.make("span.optional-text.faded", "No due date")
-            );
-        }
-            
-        let toDoNode = doc.make(`.task.${priority}-priority`, [
-            doc.make(".title", task.title),
-            dueNode,
-            buttonComplete
-        ]);
-        toDoNode.addEventListener("click", function(event) {
-            if (event.target != buttonComplete) {
-                TaskFormController.showEditDialog(task);
-            }
-        });
-        return toDoNode;
-    };
+      let daysFromNow = dateDiffs.businessDaysFromToday(task.dueDate);
+      if (daysFromNow < 0) {
+        dueNode.classList.add("overdue");
+      } else if (daysFromNow <= 1) {
+        dueNode.classList.add("urgent");
+      }
+    } else {
+      dueNode.append(doc.make("span.optional-text.faded", "No due date"));
+    }
 
-    const _renderCompletedTasks = function() {
-        if (!todo.currentProject) {
-            completedTasksSection.classList.add("hidden");
-            return;
-        }
-        const completedTasks = todo.currentProject.completedTasks;
+    let toDoNode = doc.make(`.task.${priority}-priority`, [
+      doc.make(".title", task.title),
+      dueNode,
+      buttonComplete,
+    ]);
+    toDoNode.addEventListener("click", function (event) {
+      if (event.target != buttonComplete) {
+        TaskFormController.showEditDialog(task);
+      }
+    });
+    return toDoNode;
+  };
 
-        if (completedTasks.length == 0) {
-            completedTasksSection.classList.add("hidden");
-            return;
-        }
+  const _renderCompletedTasks = function () {
+    if (!todo.currentProject) {
+      completedTasksSection.classList.add("hidden");
+      return;
+    }
+    const completedTasks = todo.currentProject.completedTasks;
 
-        completedTasksSection.classList.remove("hidden");
-        completedListContainerNode.replaceChildren();
-        for (const task of completedTasks) {
-            completedListContainerNode.appendChild(_makeCompletedNode(task));
-        }
-    };
+    if (completedTasks.length == 0) {
+      completedTasksSection.classList.add("hidden");
+      return;
+    }
 
-    const _makeCompletedNode = function(task) {
-        const editButton = doc.make("button.edit-completed-task", "Edit");
-        editButton.addEventListener("click", function() {
-            TaskFormController.showEditDialog(task);
-        });
+    completedTasksSection.classList.remove("hidden");
+    completedListContainerNode.replaceChildren();
+    for (const task of completedTasks) {
+      completedListContainerNode.appendChild(_makeCompletedNode(task));
+    }
+  };
 
-        const taskNode = doc.make("tr.completed-task", [
-            doc.td(task.title),
-            doc.td(task.completionDate?.toDateString()),
-            doc.td([
-                editButton,
-            ]),
-        ]);
-        return taskNode;
-    };
+  const _makeCompletedNode = function (task) {
+    const editButton = doc.make("button.edit-completed-task", "Edit");
+    editButton.addEventListener("click", function () {
+      TaskFormController.showEditDialog(task);
+    });
 
-    return {
-        markComplete,
-        setProject,
-        refresh
-    };
-}());
+    const taskNode = doc.make("tr.completed-task", [
+      doc.td(task.title),
+      doc.td(task.completionDate?.toDateString()),
+      doc.td([editButton]),
+    ]);
+    return taskNode;
+  };
+
+  return {
+    markComplete,
+    setProject,
+    refresh,
+  };
+})();
 
 //=============================================================================
 // Project Form Controller
 //=============================================================================
 
-const ProjectFormController = (function() {
+const ProjectFormController = (function () {
+  let _currentProject = null;
 
-    let _currentProject = null;
+  // Nodes
 
-    // Nodes
+  const newProjectShowButton = document.getElementById("new-project-button");
+  const editProjectShowButton = document.getElementById("edit-project-button");
 
-    const newProjectShowButton =
-        document.getElementById("new-project-button");
-    const editProjectShowButton =
-        document.getElementById("edit-project-button");
+  const projectDialog = document.getElementById("project-dialog");
+  const projectForm = document.getElementById("project-form");
+  const formHeading = document.getElementById("project-form-heading");
 
-    const projectDialog =
-        document.getElementById("project-dialog");
-    const projectForm =
-        document.getElementById("project-form");
-    const formHeading =
-        document.getElementById("project-form-heading");
+  const nameInput = document.getElementById("project-name");
+  const descriptionInput = document.getElementById("project-description");
 
-    const nameInput =
-        document.getElementById("project-name");
-    const descriptionInput = 
-        document.getElementById("project-description");
-    
-    const buttonRow =
-        document.getElementById("project-button-row");
-    const submitButton =
-        document.getElementById("project-submit");
-    const cancelButton =
-        document.getElementById("project-cancel");
-    
-    const startDeleteButton =
-        document.getElementById("project-start-delete");
+  const buttonRow = document.getElementById("project-button-row");
+  const submitButton = document.getElementById("project-submit");
+  const cancelButton = document.getElementById("project-cancel");
 
-    const deleteButtonRow =
-        document.getElementById("delete-project-button-row");
-    const confirmDeleteButton =
-        document.getElementById("delete-project-confirm");
-    const cancelDeleteButton =
-        document.getElementById("delete-project-cancel");
+  const startDeleteButton = document.getElementById("project-start-delete");
 
-    // Setup
+  const deleteButtonRow = document.getElementById("delete-project-button-row");
+  const confirmDeleteButton = document.getElementById("delete-project-confirm");
+  const cancelDeleteButton = document.getElementById("delete-project-cancel");
 
-    newProjectShowButton.addEventListener("click", function() {
-        showCreateDialog();
-    });
+  // Setup
 
-    editProjectShowButton.addEventListener("click", function() {
-        showEditDialog(todo.currentProject);
-    });
+  newProjectShowButton.addEventListener("click", function () {
+    showCreateDialog();
+  });
 
-    submitButton.addEventListener("click", function(event) {
-        if (projectForm.checkValidity() == false) {
-            return; // Do built-in validation and nothing else
-        }
-        event.preventDefault();
+  editProjectShowButton.addEventListener("click", function () {
+    showEditDialog(todo.currentProject);
+  });
 
-        const props = {
-            name: nameInput.value,
-            description: descriptionInput.value,
-        };
+  submitButton.addEventListener("click", function (event) {
+    if (projectForm.checkValidity() == false) {
+      return; // Do built-in validation and nothing else
+    }
+    event.preventDefault();
 
-        if (_currentProject) {
-            editProject(_currentProject, props);
-        } else {
-            addProject(props);
-        }
-        hideDialog();
-    });
-
-    cancelButton.addEventListener("click", function() {
-        hideDialog();
-    });
-
-    startDeleteButton.addEventListener("click", function() {
-        startDeleteMode();
-    });
-
-    cancelDeleteButton.addEventListener("click", function() {
-        endDeleteMode();
-    });
-
-    confirmDeleteButton.addEventListener("click", function() {
-        deleteProject(_currentProject);
-        hideDialog();
-    })
-
-    const startDeleteMode = function() {
-        buttonRow.classList.add("hidden");
-        deleteButtonRow.classList.remove("hidden");
+    const props = {
+      name: nameInput.value,
+      description: descriptionInput.value,
     };
 
-    const endDeleteMode = function() {
-        deleteButtonRow.classList.add("hidden");
-        buttonRow.classList.remove("hidden");
-    };
+    if (_currentProject) {
+      editProject(_currentProject, props);
+    } else {
+      addProject(props);
+    }
+    hideDialog();
+  });
 
-    // Public methods
+  cancelButton.addEventListener("click", function () {
+    hideDialog();
+  });
 
-    const showCreateDialog = function() {
-        _currentProject = null;
+  startDeleteButton.addEventListener("click", function () {
+    startDeleteMode();
+  });
 
-        projectForm.classList.remove("edit");
-        projectForm.classList.add("create");
-        formHeading.innerText = "Create Project";
-        submitButton.innerText = "Create";
+  cancelDeleteButton.addEventListener("click", function () {
+    endDeleteMode();
+  });
 
-        nameInput.value = "";
-        descriptionInput.value = "";
+  confirmDeleteButton.addEventListener("click", function () {
+    deleteProject(_currentProject);
+    hideDialog();
+  });
 
-        projectDialog.classList.remove("hidden");
-    };
+  const startDeleteMode = function () {
+    buttonRow.classList.add("hidden");
+    deleteButtonRow.classList.remove("hidden");
+  };
 
-    const showEditDialog = function(project) {
-        _currentProject = project;
+  const endDeleteMode = function () {
+    deleteButtonRow.classList.add("hidden");
+    buttonRow.classList.remove("hidden");
+  };
 
-        if (1 == todo.projectCount) {
-            // Can't delete only project.
-            startDeleteButton.disabled = true;
-            startDeleteButton.innerText = "Can't Delete";
-        } else {
-            startDeleteButton.disabled = false;
-            startDeleteButton.innerText = "Delete";
-        }
-        projectForm.classList.remove("create");
-        projectForm.classList.add("edit");
-        formHeading.innerText = "Edit Project";
-        submitButton.innerText = "Save";
+  // Public methods
 
-        nameInput.value = project.name;
-        descriptionInput.value = project.description;
+  const showCreateDialog = function () {
+    _currentProject = null;
 
-        projectDialog.classList.remove("hidden");
-    };
+    projectForm.classList.remove("edit");
+    projectForm.classList.add("create");
+    formHeading.innerText = "Create Project";
+    submitButton.innerText = "Create";
 
-    const hideDialog = function() {
-        endDeleteMode();
-        projectDialog.classList.add("hidden");
-    };
+    nameInput.value = "";
+    descriptionInput.value = "";
 
-    const addProject = function(name, description) {
-        let project = todo.addProject(name, description);
-        MainPageController.setProject(project);
-    };
+    projectDialog.classList.remove("hidden");
+  };
 
-    const editProject = function(project, properties) {
-        project.name = properties.name;
-        project.description = properties.description;
-        MainPageController.refresh();
-    };
+  const showEditDialog = function (project) {
+    _currentProject = project;
 
-    const deleteProject = function(project) {
-        todo.removeProject(project);
-        MainPageController.refresh();
-    };
+    if (1 == todo.projectCount) {
+      // Can't delete only project.
+      startDeleteButton.disabled = true;
+      startDeleteButton.innerText = "Can't Delete";
+    } else {
+      startDeleteButton.disabled = false;
+      startDeleteButton.innerText = "Delete";
+    }
+    projectForm.classList.remove("create");
+    projectForm.classList.add("edit");
+    formHeading.innerText = "Edit Project";
+    submitButton.innerText = "Save";
 
-    return {
-        showCreateDialog,
-        showEditDialog,
-        hideDialog,
-        addProject
-    };
-}());
+    nameInput.value = project.name;
+    descriptionInput.value = project.description;
+
+    projectDialog.classList.remove("hidden");
+  };
+
+  const hideDialog = function () {
+    endDeleteMode();
+    projectDialog.classList.add("hidden");
+  };
+
+  const addProject = function (name, description) {
+    let project = todo.addProject(name, description);
+    MainPageController.setProject(project);
+  };
+
+  const editProject = function (project, properties) {
+    project.name = properties.name;
+    project.description = properties.description;
+    MainPageController.refresh();
+  };
+
+  const deleteProject = function (project) {
+    todo.removeProject(project);
+    MainPageController.refresh();
+  };
+
+  return {
+    showCreateDialog,
+    showEditDialog,
+    hideDialog,
+    addProject,
+  };
+})();
 
 //=============================================================================
 // Task Form Controller
 //=============================================================================
 
-const TaskFormController = (function() {
+const TaskFormController = (function () {
+  // Variables
 
-    // Variables
+  let _currentTask = null;
 
-    let _currentTask = null;
+  // Nodes
 
-    // Nodes
+  const newTaskShowButton = document.getElementById("new-task-show-button");
 
-    const newTaskShowButton =
-        document.getElementById("new-task-show-button");
+  const taskDialog = document.getElementById("task-dialog");
+  const taskForm = document.getElementById("task-form");
+  const formHeading = document.getElementById("task-form-heading");
+  const titleInput = document.getElementById("task-title");
+  const descriptionInput = document.getElementById("task-description");
+  const priorityInput = document.getElementById("task-priority");
+  const dueDateInput = document.getElementById("task-due-date");
 
-    const taskDialog =
-        document.getElementById("task-dialog");
-    const taskForm =
-        document.getElementById("task-form");
-    const formHeading =
-        document.getElementById("task-form-heading");
-    const titleInput =
-        document.getElementById("task-title");
-    const descriptionInput =
-        document.getElementById("task-description");
-    const priorityInput =
-        document.getElementById("task-priority");
-    const dueDateInput =
-        document.getElementById("task-due-date");
-    
-    const buttonRow =
-        document.getElementById("task-button-row");
-    const submitButton =
-        document.getElementById("task-submit");
-    const cancelButton =
-        document.getElementById("task-cancel");
-    
-    const startDeleteButton =
-        document.getElementById("task-start-delete");
+  const buttonRow = document.getElementById("task-button-row");
+  const submitButton = document.getElementById("task-submit");
+  const cancelButton = document.getElementById("task-cancel");
 
-    const deleteButtonRow =
-        document.getElementById("delete-task-button-row");
-    const confirmDeleteButton =
-        document.getElementById("delete-task-confirm");
-    const cancelDeleteButton =
-        document.getElementById("delete-task-cancel");
-    
-    // Setup
+  const startDeleteButton = document.getElementById("task-start-delete");
 
-    newTaskShowButton.addEventListener("click", function() {
-        showCreateDialog();
-    });
+  const deleteButtonRow = document.getElementById("delete-task-button-row");
+  const confirmDeleteButton = document.getElementById("delete-task-confirm");
+  const cancelDeleteButton = document.getElementById("delete-task-cancel");
 
-    submitButton.addEventListener("click", function(event) {
-        if (taskForm.checkValidity() == false) {
-            return; // Do built-in validation and nothing else.
-        }
-        event.preventDefault();
-        
-        // Gather properties
-        let properties = {
-            title: titleInput.value,
-            description: descriptionInput.value,
-            priority: Number.parseInt(priorityInput.value),
-            dueDate: dateDiffs.inputToLocalEOD(dueDateInput.value),
-        };
+  // Setup
 
-        if (_currentTask) {
-            editTask(_currentTask, properties);
-        } else {
-            addTask(properties);
-        }
-        hideDialog();
-    });
+  newTaskShowButton.addEventListener("click", function () {
+    showCreateDialog();
+  });
 
-    startDeleteButton.addEventListener("click", function() {
-        startDeleteMode();
-    });
+  submitButton.addEventListener("click", function (event) {
+    if (taskForm.checkValidity() == false) {
+      return; // Do built-in validation and nothing else.
+    }
+    event.preventDefault();
 
-    cancelButton.addEventListener("click", function() {
-        hideDialog();
-    });
-
-    confirmDeleteButton.addEventListener("click", function() {
-        deleteTask(_currentTask);
-        hideDialog();
-    });
-
-    cancelDeleteButton.addEventListener("click", function() {
-        endDeleteMode();
-    });
-
-    // Dialog display
-
-    const showCreateDialog = function() {
-        _currentTask = null;
-
-        taskForm.classList.remove("edit");
-        taskForm.classList.add("create");
-        _removePriorityClasses();
-
-        formHeading.innerText = "Create Task";
-        submitButton.innerText = "Create";
-        titleInput.value = "";
-        descriptionInput.value = "";
-        priorityInput.value = todo.priority.MEDIUM;
-        dueDateInput.value = null;
-
-        taskDialog.classList.remove("hidden");
+    // Gather properties
+    let properties = {
+      title: titleInput.value,
+      description: descriptionInput.value,
+      priority: Number.parseInt(priorityInput.value),
+      dueDate: dateDiffs.inputToLocalEOD(dueDateInput.value),
     };
 
-    const showEditDialog = function(task) {
-        _currentTask = task;
+    if (_currentTask) {
+      editTask(_currentTask, properties);
+    } else {
+      addTask(properties);
+    }
+    hideDialog();
+  });
 
-        taskForm.classList.remove("create");
-        taskForm.classList.add("edit");
-        _setPriorityClass(task.priorityWord);
+  startDeleteButton.addEventListener("click", function () {
+    startDeleteMode();
+  });
 
-        formHeading.innerText = "Edit Task";
-        submitButton.innerText = "Save";
+  cancelButton.addEventListener("click", function () {
+    hideDialog();
+  });
 
-        titleInput.value = task.title;
-        descriptionInput.value = task.description;
-        priorityInput.value = task.priority;
-        dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
-        
+  confirmDeleteButton.addEventListener("click", function () {
+    deleteTask(_currentTask);
+    hideDialog();
+  });
 
-        taskDialog.classList.remove("hidden");
-    };
+  cancelDeleteButton.addEventListener("click", function () {
+    endDeleteMode();
+  });
 
-    const hideDialog = function() {
-        taskDialog.classList.add("hidden");
-        endDeleteMode();
-        _currentTask = null;
-    };
+  // Dialog display
 
-    const startDeleteMode = function() {
-        buttonRow.classList.add("hidden");
-        deleteButtonRow.classList.remove("hidden");
-    };
+  const showCreateDialog = function () {
+    _currentTask = null;
 
-    const endDeleteMode = function() {
-        deleteButtonRow.classList.add("hidden");
-        buttonRow.classList.remove("hidden");
-    };
+    taskForm.classList.remove("edit");
+    taskForm.classList.add("create");
+    _removePriorityClasses();
 
-    // Actions
+    formHeading.innerText = "Create Task";
+    submitButton.innerText = "Create";
+    titleInput.value = "";
+    descriptionInput.value = "";
+    priorityInput.value = todo.priority.MEDIUM;
+    dueDateInput.value = null;
 
-    const addTask = function(properties) {
-        todo.currentProject.addTask(properties);
-        MainPageController.refresh();
-    };
+    taskDialog.classList.remove("hidden");
+  };
 
-    const editTask = function(task, properties) {
-        task.title = properties.title;
-        task.description = properties.description;
-        task.priority = properties.priority;
-        task.dueDate = properties.dueDate;
-        MainPageController.refresh();
-    };
+  const showEditDialog = function (task) {
+    _currentTask = task;
 
-    const deleteTask = function(task) {
-        todo.currentProject.removeTask(task);
-        MainPageController.refresh();
-    };
+    taskForm.classList.remove("create");
+    taskForm.classList.add("edit");
+    _setPriorityClass(task.priorityWord);
 
-    // Helper methods
+    formHeading.innerText = "Edit Task";
+    submitButton.innerText = "Save";
 
-    const PRIORITY_SUFFIX = "-priority";
+    titleInput.value = task.title;
+    descriptionInput.value = task.description;
+    priorityInput.value = task.priority;
+    dueDateInput.value = dateDiffs.toInputDateString(task.dueDate);
 
-    const _removePriorityClasses = function() {
-        // Find classes to remove
-        let oldClassNames = [];
-        for (const className of taskForm.classList.values()) {
-            if (className.endsWith(PRIORITY_SUFFIX)) {
-                oldClassNames.push(className);
-            }
-        }
+    taskDialog.classList.remove("hidden");
+  };
 
-        // Remove the classes
-        for (const className of oldClassNames) {
-            taskForm.classList.remove(className);
-        }
+  const hideDialog = function () {
+    taskDialog.classList.add("hidden");
+    endDeleteMode();
+    _currentTask = null;
+  };
+
+  const startDeleteMode = function () {
+    buttonRow.classList.add("hidden");
+    deleteButtonRow.classList.remove("hidden");
+  };
+
+  const endDeleteMode = function () {
+    deleteButtonRow.classList.add("hidden");
+    buttonRow.classList.remove("hidden");
+  };
+
+  // Actions
+
+  const addTask = function (properties) {
+    todo.currentProject.addTask(properties);
+    MainPageController.refresh();
+  };
+
+  const editTask = function (task, properties) {
+    task.title = properties.title;
+    task.description = properties.description;
+    task.priority = properties.priority;
+    task.dueDate = properties.dueDate;
+    MainPageController.refresh();
+  };
+
+  const deleteTask = function (task) {
+    todo.currentProject.removeTask(task);
+    MainPageController.refresh();
+  };
+
+  // Helper methods
+
+  const PRIORITY_SUFFIX = "-priority";
+
+  const _removePriorityClasses = function () {
+    // Find classes to remove
+    let oldClassNames = [];
+    for (const className of taskForm.classList.values()) {
+      if (className.endsWith(PRIORITY_SUFFIX)) {
+        oldClassNames.push(className);
+      }
     }
 
-    const _setPriorityClass = function(priorityWord) {
-        _removePriorityClasses();
-        const myClassName = priorityWord.toLowerCase() + PRIORITY_SUFFIX;
-        taskForm.classList.add(myClassName);
-    };
+    // Remove the classes
+    for (const className of oldClassNames) {
+      taskForm.classList.remove(className);
+    }
+  };
 
-    return {
-        showCreateDialog,
-        showEditDialog,
-        hideDialog,
-        addTask,
-        editTask,
-        deleteTask
-    };
-}());
+  const _setPriorityClass = function (priorityWord) {
+    _removePriorityClasses();
+    const myClassName = priorityWord.toLowerCase() + PRIORITY_SUFFIX;
+    taskForm.classList.add(myClassName);
+  };
+
+  return {
+    showCreateDialog,
+    showEditDialog,
+    hideDialog,
+    addTask,
+    editTask,
+    deleteTask,
+  };
+})();
 
 MainPageController.refresh();
