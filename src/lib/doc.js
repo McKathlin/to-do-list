@@ -4,8 +4,8 @@
 
 const doc = (function() {
     const _typeRegex = /^([a-z][a-z0-9]*)/i;
-    const _idRegex = /#([a-z][a-z0-9_\-]*)/i;
-    const _classRegex = /\.[a-z0-9_\-]+/gi;
+    const _idRegex = /#([a-z](?:\w|-)*)/i;
+    const _classRegex = /\.(?:\w|-)+/gi;
 
     const _classListPropertyNames = ["classes", "classList"];
     const _specialPropertySet = new Set([
