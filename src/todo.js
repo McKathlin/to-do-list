@@ -282,7 +282,7 @@ const todo = (function() {
             }
 
             let removalIndex = this._tasks.findIndex((element) => {
-                for (key in criteria) {
+                for (const key in criteria) {
                     if (element[key] != criteria[key]) {
                         return false;
                     }
@@ -413,7 +413,7 @@ const todo = (function() {
         }
 
         getProjectAt(index) {
-            return getProject(this._projectPreviews[index]);
+            return this.getProject(this._projectPreviews[index]);
         }
 
         getProject(projHandle) {
