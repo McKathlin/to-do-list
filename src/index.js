@@ -79,7 +79,7 @@ const MainPageController = (function() {
         } else {
             button.classList.add("other");
         }
-        button.addEventListener("click", function(event) {
+        button.addEventListener("click", function() {
             setProject(projectPreview);
         });
         return button;
@@ -106,7 +106,7 @@ const MainPageController = (function() {
 
     const _makeToDoNode = function(task) {
         let buttonComplete = doc.make("button.complete-button", "Done");
-        buttonComplete.addEventListener("click", function(event) {
+        buttonComplete.addEventListener("click", function() {
             markComplete(task);
         });
 
@@ -143,7 +143,7 @@ const MainPageController = (function() {
         return toDoNode;
     };
 
-    const _renderCompletedTasks = function(task) {
+    const _renderCompletedTasks = function() {
         if (!todo.currentProject) {
             completedTasksSection.classList.add("hidden");
             return;
@@ -164,7 +164,7 @@ const MainPageController = (function() {
 
     const _makeCompletedNode = function(task) {
         const editButton = doc.make("button.edit-completed-task", "Edit");
-        editButton.addEventListener("click", function(event) {
+        editButton.addEventListener("click", function() {
             TaskFormController.showEditDialog(task);
         });
 
@@ -231,11 +231,11 @@ const ProjectFormController = (function() {
 
     // Setup
 
-    newProjectShowButton.addEventListener("click", function(event) {
+    newProjectShowButton.addEventListener("click", function() {
         showCreateDialog();
     });
 
-    editProjectShowButton.addEventListener("click", function(event) {
+    editProjectShowButton.addEventListener("click", function() {
         showEditDialog(todo.currentProject);
     });
 
@@ -258,19 +258,19 @@ const ProjectFormController = (function() {
         hideDialog();
     });
 
-    cancelButton.addEventListener("click", function(event) {
+    cancelButton.addEventListener("click", function() {
         hideDialog();
     });
 
-    startDeleteButton.addEventListener("click", function(event) {
+    startDeleteButton.addEventListener("click", function() {
         startDeleteMode();
     });
 
-    cancelDeleteButton.addEventListener("click", function(event) {
+    cancelDeleteButton.addEventListener("click", function() {
         endDeleteMode();
     });
 
-    confirmDeleteButton.addEventListener("click", function(event) {
+    confirmDeleteButton.addEventListener("click", function() {
         deleteProject(_currentProject);
         hideDialog();
     })
@@ -401,7 +401,7 @@ const TaskFormController = (function() {
     
     // Setup
 
-    newTaskShowButton.addEventListener("click", function(event) {
+    newTaskShowButton.addEventListener("click", function() {
         showCreateDialog();
     });
 
@@ -427,20 +427,20 @@ const TaskFormController = (function() {
         hideDialog();
     });
 
-    startDeleteButton.addEventListener("click", function(event) {
+    startDeleteButton.addEventListener("click", function() {
         startDeleteMode();
     });
 
-    cancelButton.addEventListener("click", function(event) {
+    cancelButton.addEventListener("click", function() {
         hideDialog();
     });
 
-    confirmDeleteButton.addEventListener("click", function(event) {
+    confirmDeleteButton.addEventListener("click", function() {
         deleteTask(_currentTask);
         hideDialog();
     });
 
-    cancelDeleteButton.addEventListener("click", function(event) {
+    cancelDeleteButton.addEventListener("click", function() {
         endDeleteMode();
     });
 
