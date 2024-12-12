@@ -23,7 +23,7 @@ const storage = (function() {
         }
         if (!proto.wipeSave) {
             proto.wipeSave = function() {
-                if (!this._id !== undefined) {
+                if (this.id !== undefined) {
                     storage.wipe(this);
                 }
             }
